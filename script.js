@@ -163,6 +163,8 @@ async function spin() {
         reel.style.transform = 'translateY(0)';
         void reel.offsetHeight; // reflow
         reel.classList.add('spinning');
+        const img = reel.querySelector('.symbol-img');
+        if (img) img.classList.add('spinning');
     });
     
     // Simular tempo de giro
@@ -172,8 +174,10 @@ async function spin() {
     let isWin = false;
     for (let i = 0; i < reels.length; i++) {
         await sleep(300);
-        const reel = reels[i];
-        reel.classList.remove('spinning');
+    const reel = reels[i];
+    reel.classList.remove('spinning');
+    const img = reel.querySelector('.symbol-img');
+    if (img) img.classList.remove('spinning');
         // Escolher símbolo final
         const randomSymbol = Math.floor(Math.random() * symbols.length);
         // Parar suavemente no símbolo escolhido (cada símbolo = 20% da altura do reel)
