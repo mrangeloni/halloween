@@ -123,23 +123,21 @@ body {
 
 .slot-header {
     background: linear-gradient(180deg, #8b4513 0%, #6b3410 50%, #4a2408 100%);
-    border: 6px solid #ff8c00;
-    border-radius: 100px 100px 0 0;
-    padding: 30px 20px;
-    box-shadow: 
-        0 8px 20px rgba(0, 0, 0, 0.5),
-        inset 0 -4px 10px rgba(0, 0, 0, 0.3);
+    border: 4px solid #ff8c00;
+    border-radius: 24px 24px 0 0;
+    padding: 16px 12px;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.45), inset 0 -3px 8px rgba(0, 0, 0, 0.25);
     position: relative;
-    margin-bottom: -10px;
+    margin-bottom: -6px;
 }
 
 .title {
-    font-size: 3.5em;
+    font-size: 2.4em;
     color: #ffa500;
     text-shadow: 
-        3px 3px 0 #ff6600,
-        6px 6px 0 #cc5200,
-        9px 9px 20px rgba(0, 0, 0, 0.8);
+        2px 2px 0 #ff6600,
+        4px 4px 0 #cc5200,
+        6px 6px 16px rgba(0, 0, 0, 0.8);
     line-height: 0.9;
     letter-spacing: 2px;
 }
@@ -155,22 +153,22 @@ body {
 
 .attempts-counter {
     background: rgba(139, 69, 19, 0.8);
-    border: 3px solid #ff8c00;
-    border-radius: 15px;
-    padding: 10px 20px;
-    margin: 20px auto;
-    max-width: 300px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    border: 2px solid #ff8c00;
+    border-radius: 12px;
+    padding: 8px 16px;
+    margin: 16px auto;
+    max-width: 280px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.5);
 }
 
 .attempts-counter p {
-    font-size: 1.2em;
+    font-size: 1.1em;
     color: #ffa500;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
 }
 
 .attempts-counter span {
-    font-size: 1.5em;
+    font-size: 1.3em;
     color: #ffff00;
     font-weight: bold;
 }
@@ -307,37 +305,25 @@ body {
 
 .spin-button {
     background: linear-gradient(180deg, #ffa500 0%, #ff8c00 50%, #ff6600 100%);
-    border: 6px solid #8b4513;
-    border-radius: 50px;
-    padding: 20px 60px;
-    font-size: 2em;
+    border: 4px solid #8b4513;
+    border-radius: 40px;
+    padding: 16px 40px;
+    font-size: 1.6em;
     font-weight: bold;
     color: #4a2408;
-    text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.5);
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
     cursor: pointer;
-    margin: 30px auto;
+    margin: 24px auto;
     display: block;
-    box-shadow: 
-        0 8px 20px rgba(0, 0, 0, 0.5),
-        inset 0 -4px 10px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5), inset 0 -3px 8px rgba(0, 0, 0, 0.3);
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
 }
 
-.spin-button:hover {
-    transform: scale(1.05);
-    box-shadow: 
-        0 10px 30px rgba(255, 140, 0, 0.8),
-        inset 0 -4px 10px rgba(0, 0, 0, 0.3);
-}
+.spin-button:hover { transform: scale(1.03); box-shadow: 0 8px 22px rgba(255, 140, 0, 0.75), inset 0 -3px 8px rgba(0, 0, 0, 0.3); }
 
-.spin-button:active {
-    transform: scale(0.95);
-    box-shadow: 
-        0 4px 10px rgba(0, 0, 0, 0.5),
-        inset 0 4px 10px rgba(0, 0, 0, 0.5);
-}
+.spin-button:active { transform: scale(0.97); box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5), inset 0 4px 10px rgba(0, 0, 0, 0.5); }
 
 .spin-button:disabled {
     opacity: 0.5;
@@ -345,17 +331,7 @@ body {
     transform: scale(1);
 }
 
-.spin-button::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-    transform: rotate(45deg);
-    animation: shine 3s infinite;
-}
+.spin-button::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent); transform: rotate(45deg); animation: shine 3s infinite; }
 
 @keyframes shine {
     0% {
@@ -401,7 +377,7 @@ body {
    ======================================== */
 
 .encouragement {
-    font-size: 1.5em;
+    font-size: 1.3em;
     color: #ffa500;
     text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
     margin-top: 20px;
