@@ -227,17 +227,28 @@ body {
     width: 100%;
     height: 100%;
     gap: 0;
-    overflow: visible;
+    overflow: visible; /* container allows positioning */
     position: static;
-    z-index: 2;
+    z-index: 1; /* under the frame overlay */
     padding-top: 80px;
     padding-right: 35px;
 
 }
 
+/* Viewport to clip the spinning reel inside the frame window */
+.reel-viewport {
+    position: relative;
+    width: 264px; /* 220px * 1.2 to give breathing room */
+    aspect-ratio: 4 / 5; /* enforce 4:5 window */
+    overflow: hidden; /* clip spinning content */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .reel {
-    width: 220px;
-    height: 220px;
+    width: 100%;
+    height: 125%; /* taller than viewport so spin can translate */
     background: rgba(45, 27, 78, 0.85);
     border: 3px solid #8b4513;
     box-shadow: 0 0 30px rgba(0,0,0,0.5);
@@ -272,8 +283,25 @@ body {
         transform: translateY(0);
     }
     100% {
-        transform: translateY(-600px);
+        transform: translateY(-100%);
     }
+}
+
+/* Ensure the frame overlays reels visually */
+.slot-frame {
+    position: relative;
+    z-index: 2;
+}
+.slot-frame::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: inherit; /* reuse same frame image */
+    background-size: inherit;
+    background-repeat: inherit;
+    background-position: inherit;
+    pointer-events: none;
+    z-index: 3; /* top-most overlay */
 }
 
 /* ========================================
