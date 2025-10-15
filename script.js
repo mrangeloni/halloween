@@ -16,13 +16,26 @@ Símbolos sugeridos:
 5. Pote de prêmio (prize pot)
 */
 
-const symbols = [
-    'https://via.placeholder.com/200/ff8c00/ffffff?text=🎃',  // Símbolo 1 - Abóbora
-    'https://via.placeholder.com/200/8b4513/ffffff?text=🧙',  // Símbolo 2 - Bruxa
-    'https://via.placeholder.com/200/2d1b4e/ffffff?text=🍯',  // Símbolo 3 - Caldeirão
-    'https://via.placeholder.com/200/1a0033/ffffff?text=🦇',  // Símbolo 4 - Morcego
-    'https://via.placeholder.com/200/ffa500/ffffff?text=💰'   // Símbolo 5 - Pote de prêmio
+// Caminhos locais esperados (adicione seus arquivos em assets/symbols/)
+const localSymbols = [
+    'assets/symbols/pumpkin.png',   // Símbolo 1 - Abóbora
+    'assets/symbols/witch.png',     // Símbolo 2 - Bruxa
+    'assets/symbols/cauldron.png',  // Símbolo 3 - Caldeirão
+    'assets/symbols/bat.png',       // Símbolo 4 - Morcego
+    'assets/symbols/prize.png'      // Símbolo 5 - Pote de prêmio
 ];
+
+// Placeholders usados como fallback caso a imagem local não exista
+const fallbackSymbols = [
+    'https://via.placeholder.com/200/ff8c00/ffffff?text=🎃',  // Abóbora
+    'https://via.placeholder.com/200/8b4513/ffffff?text=🧙',  // Bruxa
+    'https://via.placeholder.com/200/2d1b4e/ffffff?text=🍯',  // Caldeirão
+    'https://via.placeholder.com/200/1a0033/ffffff?text=🦇',  // Morcego
+    'https://via.placeholder.com/200/ffa500/ffffff?text=💰'   // Pote de prêmio
+];
+
+// Array efetivo de símbolos que o jogo usa
+const symbols = localSymbols;
 
 /*
 INSTRUÇÕES PARA CONFIGURAR O BANNER DE PRÊMIO:
@@ -81,6 +94,7 @@ function loadSymbols() {
     reels.forEach(reel => {
         const symbolElements = reel.querySelectorAll('.symbol-img');
         symbolElements.forEach((img, index) => {
+            img.onerror = () => { img.src = fallbackSymbols[index]; };
             img.src = symbols[index];
         });
     });
@@ -155,9 +169,10 @@ async function spin() {
         reels[i].classList.remove('spinning');
         
         // Definir símbolo final aleatório
-        const randomSymbol = Math.floor(Math.random() * symbols.length);
-        const symbolImg = reels[i].querySelector('.symbol-img');
-        symbolImg.src = symbols[randomSymbol];
+    const randomSymbol = Math.floor(Math.random() * symbols.length);
+    const symbolImg = reels[i].querySelector('.symbol-img');
+    symbolImg.onerror = () => { symbolImg.src = fallbackSymbols[randomSymbol]; };
+    symbolImg.src = symbols[randomSymbol];
     }
     
     // Aguardar um pouco antes de mostrar o resultado
