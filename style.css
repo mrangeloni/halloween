@@ -1,3 +1,14 @@
+/* Container para limitar animação dos slots dentro da moldura */
+.slot-viewport {
+    width: 200px;
+    height: 200px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+}
 /* ========================================
    CONFIGURAÇÃO DE IMAGENS - INSTRUÇÕES
    ======================================== */
