@@ -67,6 +67,7 @@ Object.values(sounds).forEach(sound => {
 let attemptsLeft = 5;
 let currentAttempt = 0;
 let isSpinning = false;
+const WIN_INDEX = 2; // índice do 'pote-5brindes' no array localSymbols
 
 // ========================================
 // ELEMENTOS DOM
@@ -156,7 +157,12 @@ async function spin() {
     }
     
     // Adicionar classe de animação
+    // Preparar rotação: resetar posição e iniciar animação apenas na tira de símbolos (.reel)
     reels.forEach(reel => {
+        reel.style.transition = 'none';
+        reel.style.transform = 'translateY(0)';
+        // Força reflow para aplicar imediatamente
+        void reel.offsetHeight;
         reel.classList.add('spinning');
     });
     
@@ -164,25 +170,33 @@ async function spin() {
     await sleep(2000);
     
     // Parar as bobinas uma por uma
+    let isWin = false;
     for (let i = 0; i < reels.length; i++) {
         await sleep(300);
-        reels[i].classList.remove('spinning');
-        
-        // Definir símbolo final aleatório
-    const randomSymbol = Math.floor(Math.random() * symbols.length);
-    const symbolImg = reels[i].querySelector('.symbol-img');
-    symbolImg.onerror = () => { symbolImg.src = fallbackSymbols[randomSymbol]; };
-    symbolImg.src = symbols[randomSymbol];
+        const reel = reels[i];
+        reel.classList.remove('spinning');
+
+        // Escolher símbolo final aleatório
+        const randomSymbol = Math.floor(Math.random() * symbols.length);
+
+        // Ajustar posição da tira para parar com o símbolo escolhido visível
+        const symbolEl = reel.querySelector('.symbol');
+        const symbolHeight = symbolEl ? symbolEl.offsetHeight : 120; // fallback
+        const stopY = -(randomSymbol * symbolHeight);
+        reel.style.transition = 'transform 300ms ease-out';
+        reel.style.transform = `translateY(${stopY}px)`;
+
+        // Determinar vitória (1 símbolo vencedor)
+        if (randomSymbol === WIN_INDEX) {
+            isWin = true;
+        }
     }
     
     // Aguardar um pouco antes de mostrar o resultado
     await sleep(500);
     
-    // Verificar se é a 4ª tentativa (mega prêmio)
-    const isMegaPrize = currentAttempt === 4;
-    
-    // Mostrar modal de prêmio
-    showPrizeModal(isMegaPrize);
+    // Mostrar resultado baseado no símbolo sorteado (1 vencedor, 4 perdas)
+    showPrizeModal(isWin);
     
     // Atualizar displays
     updateAttemptsDisplay();
@@ -202,10 +216,10 @@ async function spin() {
 // FUNÇÕES DE MODAL
 // ========================================
 
-function showPrizeModal(isMegaPrize) {
+function showPrizeModal(isWin) {
     // Tocar som apropriado
     try {
-        if (isMegaPrize) {
+        if (isWin) {
             sounds.win.currentTime = 0;
             sounds.win.play().catch(e => console.log('Erro ao tocar som:', e));
         } else {
@@ -219,19 +233,13 @@ function showPrizeModal(isMegaPrize) {
     // Configurar banner de prêmio
     // NOTA: Você deve configurar diferentes banners para cada tipo de prêmio
     // Por enquanto, usamos um placeholder
-    if (isMegaPrize) {
-        prizeBannerImg.src = 'https://via.placeholder.com/600x300/ffa500/ffffff?text=MEGA+PRÊMIO!+🎁';
-        prizeBannerImg.alt = 'Mega Prêmio!';
+    if (isWin) {
+        prizeBannerImg.src = 'https://via.placeholder.com/600x300/ffa500/ffffff?text=VOC%C3%8A+GANHOU+5+BRINDES!+%F0%9F%8E%81';
+        prizeBannerImg.alt = 'Você ganhou 5 brindes!';
     } else {
-        const prizeMessages = [
-            'Você ganhou um brinde! 🎃',
-            'Parabéns! Prêmio especial! 🎁',
-            'Você ganhou um desconto! 💰',
-            'Prêmio surpresa! 🎉'
-        ];
-        const randomPrize = prizeMessages[Math.floor(Math.random() * prizeMessages.length)];
-        prizeBannerImg.src = `https://via.placeholder.com/600x300/8b4513/ffffff?text=${encodeURIComponent(randomPrize)}`;
-        prizeBannerImg.alt = randomPrize;
+        const loseMessage = 'Você perdeu! 😢';
+        prizeBannerImg.src = `https://via.placeholder.com/600x300/8b4513/ffffff?text=${encodeURIComponent(loseMessage)}`;
+        prizeBannerImg.alt = loseMessage;
     }
     
     // Mostrar modal
