@@ -1,3 +1,14 @@
+.bats-img {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 300px;
+    max-width: 80vw;
+    height: auto;
+    z-index: 2;
+    pointer-events: none;
+}
 /* ========================================
    CONFIGURAÇÃO DE IMAGENS - INSTRUÇÕES
    ======================================== */
