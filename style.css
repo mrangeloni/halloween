@@ -71,16 +71,7 @@ body {
 }
 
 /* Morcegos animados */
-.bat {
-    position: fixed;
-    width: 40px;
-    height: 30px;
-    background-color: #000;
-    clip-path: polygon(50% 0%, 0% 40%, 20% 100%, 40% 40%, 50% 50%, 60% 40%, 80% 100%, 100% 40%);
-    z-index: 2;
-    animation: fly 15s infinite ease-in-out;
-    opacity: 0.8;
-}
+.bat { display: none; }
 
 .bat1 { top: 10%; left: calc(50% - (var(--app-max-width) / 2) + 20px); animation-delay: 0s; }
 
@@ -146,17 +137,9 @@ body {
     letter-spacing: 2px;
 }
 
-.or {
-    font-size: 0.5em;
-    color: #ffcc66;
-}
-
-/* ========================================
-   CONTADOR DE TENTATIVAS
-   ======================================== */
+.moon { display: none; }
 
 .attempts-counter {
-    background: rgba(139, 69, 19, 0.8);
     border: 2px solid #ff8c00;
     border-radius: 12px;
     padding: 8px 16px;
