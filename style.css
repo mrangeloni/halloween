@@ -122,15 +122,13 @@ body {
    ======================================== */
 
 .slot-header {
-    background: linear-gradient(180deg, #8b4513 0%, #6b3410 50%, #4a2408 100%);
-    border: 6px solid #ff8c00;
-    border-radius: 100px 100px 0 0;
-    padding: 30px 20px;
-    box-shadow: 
-        0 8px 20px rgba(0, 0, 0, 0.5),
-        inset 0 -4px 10px rgba(0, 0, 0, 0.3);
+    background: none;
+    border: none;
+    border-radius: 0;
+    padding: 20px 0;
+    box-shadow: none;
     position: relative;
-    margin-bottom: -10px;
+    margin-bottom: 10px;
 }
 
 .title {
