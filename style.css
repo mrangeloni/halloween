@@ -30,164 +30,6 @@ Para configurar, edite o arquivo HTML (index.html) na linha do prizeBannerImg:
    RESET E CONFIGURAÇÕES GLOBAIS
    ======================================== */
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: 'Arial Black', 'Arial Bold', sans-serif;
-    background: linear-gradient(180deg, #1a0033 0%, #2d1b4e 50%, #1a0033 100%);
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow-x: hidden;
-    position: relative;
-    color: #fff;
-}
-:root { --app-max-width: 500px; }
-
-/* ========================================
-   ELEMENTOS DE FUNDO E DECORAÇÃO
-   ======================================== */
-
-/* Lua */
-.moon {
-    position: fixed;
-    top: 50px;
-    left: calc(50% - (var(--app-max-width) / 2) + 360px);
-    width: 100px;
-    height: 100px;
-    background: radial-gradient(circle at 30% 30%, #ffd89b 0%, #f4a460 100%);
-    border-radius: 50%;
-    box-shadow: 0 0 60px rgba(255, 216, 155, 0.6);
-    z-index: 1;
-}
-
-/* Morcegos animados */
-.bat {
-    position: fixed;
-    width: 40px;
-    height: 30px;
-    background-color: #000;
-    clip-path: polygon(50% 0%, 0% 40%, 20% 100%, 40% 40%, 50% 50%, 60% 40%, 80% 100%, 100% 40%);
-    z-index: 2;
-    animation: fly 15s infinite ease-in-out;
-    opacity: 0.8;
-}
-
-.bat1 { top: 10%; left: calc(50% - (var(--app-max-width) / 2) + 20px); animation-delay: 0s; }
-
-.bat2 { top: 20%; left: calc(50% - (var(--app-max-width) / 2) + 420px); animation-delay: 3s; }
-
-.bat3 { top: 60%; left: calc(50% - (var(--app-max-width) / 2) + 80px); animation-delay: 6s; }
-
-.bat4 { top: 70%; left: calc(50% - (var(--app-max-width) / 2) + 360px); animation-delay: 9s; }
-
-.bat5 { top: 40%; left: calc(50% - (var(--app-max-width) / 2) + 220px); animation-delay: 12s; }
-
-@keyframes fly {
-    0%, 100% {
-        transform: translate(0, 0) scale(1);
-    }
-    25% {
-        transform: translate(100px, -50px) scale(0.9);
-    }
-    50% {
-        transform: translate(200px, 20px) scale(1.1);
-    }
-    75% {
-        transform: translate(100px, 50px) scale(0.95);
-    }
-}
-
-/* ========================================
-   CONTAINER PRINCIPAL
-   ======================================== */
-
-.container {
-    position: relative;
-    z-index: 10;
-    text-align: center;
-    padding: 20px;
-    max-width: var(--app-max-width);
-    width: 100%;
-    margin: 0 auto;
-}
-
-/* ========================================
-   CABEÇALHO DA SLOT MACHINE
-   ======================================== */
-
-.slot-header {
-    background: linear-gradient(180deg, #8b4513 0%, #6b3410 50%, #4a2408 100%);
-    border: 6px solid #ff8c00;
-    border-radius: 100px 100px 0 0;
-    padding: 30px 20px;
-    box-shadow: 
-        0 8px 20px rgba(0, 0, 0, 0.5),
-        inset 0 -4px 10px rgba(0, 0, 0, 0.3);
-    position: relative;
-    margin-bottom: -10px;
-}
-
-.title {
-    font-size: 3.5em;
-    color: #ffa500;
-    text-shadow: 
-        3px 3px 0 #ff6600,
-        6px 6px 0 #cc5200,
-        9px 9px 20px rgba(0, 0, 0, 0.8);
-    line-height: 0.9;
-    letter-spacing: 2px;
-}
-
-.or {
-    font-size: 0.5em;
-    color: #ffcc66;
-}
-
-/* ========================================
-   CONTADOR DE TENTATIVAS
-   ======================================== */
-
-.attempts-counter {
-    background: rgba(139, 69, 19, 0.8);
-    border: 3px solid #ff8c00;
-    border-radius: 15px;
-    padding: 10px 20px;
-    margin: 20px auto;
-    max-width: 300px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-}
-
-.attempts-counter p {
-    font-size: 1.2em;
-    color: #ffa500;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
-}
-
-.attempts-counter span {
-    font-size: 1.5em;
-    color: #ffff00;
-    font-weight: bold;
-}
-
-/* ========================================
-   SLOT MACHINE
-   ======================================== */
-
-.slot-machine {
-    background: none;
-    border: none;
-    border-radius: 0;
-    padding: 0;
-    box-shadow: none;
-    position: relative;
-}
-
 .slot-frame {
     background-image: url('assets/slot-frame.png');
     background-size: 90% 90%;
@@ -196,10 +38,11 @@ body {
     position: relative;
     width: 416px;
     height: 416px;
-    margin: 0px auto 0 auto;
+    margin: 0 auto;
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 2;
 }
 
 .reels-container {
@@ -285,10 +128,6 @@ body {
 }
 
 /* Ensure the frame overlays reels visually */
-.slot-frame {
-    position: relative;
-    z-index: 2;
-}
 .slot-frame::after {
     content: '';
     position: absolute;
