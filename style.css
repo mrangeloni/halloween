@@ -232,8 +232,8 @@ body {
 }
 
 .reel {
-    width: 336px; /* 280px + 20% */
-    height: 336px; /* 280px + 20% */
+    width: 220px;
+    height: 220px;
     background: rgba(45, 27, 78, 0.85);
     border: 3px solid #8b4513;
     box-shadow: 0 0 30px rgba(0,0,0,0.5);
