@@ -157,18 +157,14 @@ async function spin() {
     }
     
     // Adicionar classe de animação
-    // Modo A sem efeito tira: cicla a imagem visível e gira a própria imagem
-    const intervals = [];
+    // Preparar rotação: animar a tira do reel (compatível desktop/mobile)
     reels.forEach(reel => {
+        reel.style.transition = 'none';
+        reel.style.transform = 'translateY(0)';
+        void reel.offsetHeight; // reflow
+        reel.classList.add('spinning');
         const img = reel.querySelector('.symbol-img');
-        if (!img) return;
-        let idx = 0;
-        img.classList.add('spinning');
-        intervals.push(setInterval(() => {
-            idx = (idx + 1) % symbols.length;
-            img.onerror = () => { img.src = fallbackSymbols[idx]; };
-            img.src = symbols[idx];
-        }, 100));
+        if (img) img.classList.add('spinning');
     });
     
     // Simular tempo de giro
@@ -178,15 +174,16 @@ async function spin() {
     let isWin = false;
     for (let i = 0; i < reels.length; i++) {
         await sleep(300);
-        const reel = reels[i];
-        const img = reel.querySelector('.symbol-img');
-        if (!img) continue;
-        img.classList.remove('spinning');
-        // Escolher símbolo final e fixá-lo
+    const reel = reels[i];
+    reel.classList.remove('spinning');
+    const img = reel.querySelector('.symbol-img');
+    if (img) img.classList.remove('spinning');
+        // Escolher símbolo final
         const randomSymbol = Math.floor(Math.random() * symbols.length);
-        clearInterval(intervals[i]);
-        img.onerror = () => { img.src = fallbackSymbols[randomSymbol]; };
-        img.src = symbols[randomSymbol];
+        // Parar suavemente no símbolo escolhido (cada símbolo = 20% da altura do reel)
+        const stopPct = -randomSymbol * 20; // -20%, -40%, ...
+        reel.style.transition = 'transform 300ms ease-out';
+        reel.style.transform = `translateY(${stopPct}%)`;
         if (randomSymbol === WIN_INDEX) isWin = true;
     }
     

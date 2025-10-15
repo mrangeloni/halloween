@@ -248,7 +248,7 @@ body {
 
 .reel {
     width: 100%;
-    height: 100%; /* sem efeito tira: ocupa apenas a janela */
+    height: 500%; /* 5 símbolos => 5x a altura do viewport */
     background: rgba(45, 27, 78, 0.85);
     border: 3px solid #8b4513;
     box-shadow: 0 0 30px rgba(0,0,0,0.5);
@@ -260,15 +260,12 @@ body {
 
 .symbol {
     width: 100%;
-    height: 100%; /* um símbolo visível ocupando a janela inteira */
+    height: 20%; /* cada símbolo ocupa exatamente a janela (1/5 do reel) */
     display: flex;
     justify-content: center;
     align-items: center;
     font-size: 4em;
 }
-
-/* Oculta símbolos adicionais para não deslocar layout */
-.reel .symbol:not(:first-child) { display: none; }
 
 .symbol-img {
     max-width: 90%;
@@ -289,7 +286,14 @@ body {
 /* Animação de rotação do próprio símbolo (opcional, melhora feedback visual em mobile) */
 /* Removida rotação do símbolo individual; a bobina inteira gira */
 
-/* Sem animação do container: apenas a imagem gira/cicla via JS */
+/* Animação de giro */
+.reel.spinning {
+    animation: spin 0.12s linear infinite;
+}
+@keyframes spin {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-100%); }
+}
 
 @media (max-width: 480px) {
     .reels-container {
