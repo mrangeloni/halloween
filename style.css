@@ -248,7 +248,7 @@ body {
 
 .reel {
     width: 100%;
-    height: 500%; /* 5 símbolos => 5x a altura do viewport */
+    height: 100%; /* mesmo tamanho do viewport */
     background: rgba(45, 27, 78, 0.85);
     border: 3px solid #8b4513;
     box-shadow: 0 0 30px rgba(0,0,0,0.5);
@@ -259,11 +259,21 @@ body {
 
 .symbol {
     width: 100%;
-    height: 20%; /* cada símbolo ocupa exatamente a janela (1/5 do reel) */
-    display: flex;
+    display: none; /* esconda todos por padrão */
     justify-content: center;
     align-items: center;
     font-size: 4em;
+    height: 100%; /* a célula visível ocupa todo o viewport */
+}
+.symbol:first-child { display: flex; }
+
+/* Animação de rotação da imagem durante o giro */
+.symbol-img.spinning-image {
+    animation: rotateSymbol 0.6s linear infinite;
+}
+@keyframes rotateSymbol {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 
 .symbol-img {
@@ -274,18 +284,7 @@ body {
 }
 
 /* Animação de giro */
-.reel.spinning {
-    animation: spin 0.1s linear infinite;
-}
-
-@keyframes spin {
-    0% {
-        transform: translateY(0);
-    }
-    100% {
-        transform: translateY(-100%);
-    }
-}
+/* Removido: animação de translateY do container. Agora as imagens giram individualmente. */
 
 /* Ensure the frame overlays reels visually */
 .slot-frame {
