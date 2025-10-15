@@ -209,13 +209,11 @@ body {
 }
 
 .slot-frame {
-    background: linear-gradient(135deg, #2d1b4e 0%, #1a0033 100%);
-    border: 6px solid #ff8c00;
-    border-radius: 15px;
-    padding: 20px;
-    box-shadow: 
-        inset 0 0 20px rgba(255, 140, 0, 0.3),
-        0 4px 15px rgba(0, 0, 0, 0.6);
+    background-image: url('assets/slot-frame.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    padding: 40px;
 }
 
 .reels-container {
