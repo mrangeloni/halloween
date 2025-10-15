@@ -149,6 +149,15 @@ body {
     color: #ffcc66;
 }
 
+/* Cabeçalho de imagem */
+.title-image {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 0 auto;
+    filter: drop-shadow(0 6px 14px rgba(0,0,0,0.6));
+}
+
 /* ========================================
    CONTADOR DE TENTATIVAS
    ======================================== */
