@@ -69,9 +69,7 @@ const rulesLink = document.getElementById('rulesLink');
 const closeRulesButton = document.getElementById('closeRulesButton');
 const prizeBannerImg = document.getElementById('prizeBannerImg');
 const reels = [
-    document.getElementById('reel1'),
-    document.getElementById('reel2'),
-    document.getElementById('reel3')
+    document.getElementById('reel1')
 ];
 
 // ========================================

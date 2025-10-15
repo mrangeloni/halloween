@@ -208,18 +208,13 @@ body {
     position: relative;
 }
 
-.slot-frame {
-    background-image: url('assets/slot-frame.png');
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    padding: 40px;
-}
+/* Moldura removida */
 
 .reels-container {
     display: flex;
-    justify-content: space-around;
-    gap: 15px;
+    justify-content: center;
+    align-items: center;
+    gap: 0;
     overflow: hidden;
 }
 
@@ -676,10 +671,10 @@ body {
     }
 
     .reel {
-        width: 90px;
-        height: 90px;
-    }
-
+        width: 180px;
+        height: 180px;
+        background: rgba(45, 27, 78, 0.8);
+        border: 3px solid #8b4513;
     .symbol {
         height: 90px;
         font-size: 3em;
@@ -754,22 +749,7 @@ body {
         padding: 10px;
     }
 
-    .title {
-        font-size: 2em;
-    }
-
-    .reels-container {
-        gap: 5px;
-    }
-
-    .reel {
-        width: 80px;
-        height: 80px;
-    }
-
-    .symbol {
-        height: 80px;
-        font-size: 2.5em;
+    /* Alavanca removida */
     }
 
     .spin-button {
