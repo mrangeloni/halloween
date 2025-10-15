@@ -141,12 +141,12 @@ body {
 
 .slot-frame {
     background-image: url('assets/slot-frame.png');
-    background-size: 95% 95%;
+    background-size: 100% 100%;
     background-repeat: no-repeat;
     background-position: center;
     position: relative;
-    width: clamp(300px, 90vw, 416px); /* responsivo no mobile */
-    aspect-ratio: 1 / 1; /* mantém 1:1 */
+    width: 416px;
+    height: 416px;
     margin: -15px auto 0 auto;
 }
 
@@ -223,7 +223,7 @@ body {
     position: absolute;
     left: 50%;
     top: 50%;
-    transform: translate(-50%, -50%) translate(var(--reels-offset-x, 0), var(--reels-offset-y, 0));
+    transform: translate(-50%, -50%);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -235,7 +235,7 @@ body {
 /* Viewport to clip the spinning reel inside the frame window */
 .reel-viewport {
     position: relative;
-    width: min(65%, 300px); /* relativo à moldura e com teto */
+    width: 264px;
     aspect-ratio: 1 / 1; /* janela 1:1 */
     overflow: hidden; /* clip spinning content */
     display: flex;
