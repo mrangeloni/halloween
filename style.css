@@ -198,22 +198,22 @@ body {
    ======================================== */
 
 .slot-machine {
-    background: linear-gradient(180deg, #6b3410 0%, #4a2408 100%);
-    border: 8px solid #ff8c00;
-    border-radius: 20px;
-    padding: 30px 20px;
-    box-shadow: 
-        0 10px 30px rgba(0, 0, 0, 0.7),
-        inset 0 4px 15px rgba(0, 0, 0, 0.5);
+    background: none;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    box-shadow: none;
     position: relative;
 }
 
 .slot-frame {
     background-image: url('assets/slot-frame.png');
-    background-size: contain;
+    background-size: 100% 100%;
     background-repeat: no-repeat;
     background-position: center;
-    padding: 40px;
+    padding: 60px;
+    min-width: 500px;
+    min-height: 500px;
 }
 
 .reels-container {
@@ -225,8 +225,8 @@ body {
 }
 
 .reel {
-    width: 120px;
-    height: 120px;
+    width: 240px;
+    height: 240px;
     background: rgba(45, 27, 78, 0.8);
     border: 3px solid #8b4513;
     border-radius: 10px;
