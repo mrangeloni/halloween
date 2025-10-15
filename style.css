@@ -420,19 +420,45 @@ body {
 }
 
 /* ========================================
-   DECORAÇÕES DE HALLOWEEN
+   RODAPÉ (REGRAS E CONDIÇÕES)
    ======================================== */
 
-.decorations {
-    position: fixed;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: var(--app-max-width);
-    height: 200px;
-    z-index: 5;
-    pointer-events: none;
+.site-footer {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
 }
+
+.footer-content {
+    width: var(--app-max-width);
+    padding: 16px 20px 28px 20px;
+    background: rgba(0, 0, 0, 0.35);
+    border-top: 3px solid #ff8c00;
+    box-shadow: 0 -6px 16px rgba(0,0,0,0.4);
+    border-radius: 12px 12px 0 0;
+}
+
+.footer-pumpkins {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.footer-rules {
+    text-align: left;
+    color: #ffd27f;
+    font-size: 0.9em;
+}
+.footer-rules strong {
+    color: #ffa500;
+}
+.footer-rules ul {
+    margin: 8px 0 0 18px;
+    padding: 0;
+}
+.footer-rules li { margin-bottom: 6px; }
 
 .pumpkin {
     position: absolute;
