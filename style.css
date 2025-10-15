@@ -208,7 +208,13 @@ body {
     position: relative;
 }
 
-/* Moldura removida */
+.slot-frame {
+    background-image: url('assets/slot-frame.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    padding: 40px;
+}
 
 .reels-container {
     display: flex;
