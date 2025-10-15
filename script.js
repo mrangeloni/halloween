@@ -98,10 +98,6 @@ function loadSymbols() {
             img.onerror = () => { img.src = fallbackSymbols[index]; };
             img.src = symbols[index];
         });
-
-        // Mostrar apenas o primeiro símbolo como inicial
-        const cells = reel.querySelectorAll('.symbol');
-        cells.forEach((cell, i) => cell.style.display = i === 0 ? 'flex' : 'none');
     });
 }
 
@@ -161,27 +157,13 @@ async function spin() {
     }
     
     // Adicionar classe de animação
-    // Preparar rotação: animar somente a imagem visível e ciclar símbolos rapidamente
-    const intervals = [];
-    const currentIndexes = new Map();
+    // Preparar rotação: resetar posição e iniciar animação apenas na tira de símbolos (.reel)
     reels.forEach(reel => {
-        // Aplica a animação de rotação na imagem visível
-        const visibleImg = reel.querySelector('.symbol[style*="display: flex"] .symbol-img') || reel.querySelector('.symbol .symbol-img');
-        if (visibleImg) visibleImg.classList.add('spinning-image');
-
-        // Iniciar ciclo de imagens
-        let idx = 0;
-        currentIndexes.set(reel, idx);
-        const cells = Array.from(reel.querySelectorAll('.symbol'));
-        const interval = setInterval(() => {
-            cells[idx].style.display = 'none';
-            idx = (idx + 1) % cells.length;
-            cells[idx].style.display = 'flex';
-            currentIndexes.set(reel, idx);
-            const img = cells[idx].querySelector('.symbol-img');
-            if (img && !img.classList.contains('spinning-image')) img.classList.add('spinning-image');
-        }, 80); // velocidade do giro
-        intervals.push({ reel, interval });
+        reel.style.transition = 'none';
+        reel.style.transform = 'translateY(0)';
+        // Força reflow para aplicar imediatamente
+        void reel.offsetHeight;
+        reel.classList.add('spinning');
     });
     
     // Simular tempo de giro
@@ -192,24 +174,20 @@ async function spin() {
     for (let i = 0; i < reels.length; i++) {
         await sleep(300);
         const reel = reels[i];
+        reel.classList.remove('spinning');
 
-        // Escolher símbolo final aleatório e parar o ciclo na posição certa
-        const targetIndex = Math.floor(Math.random() * symbols.length);
-        const cells = Array.from(reel.querySelectorAll('.symbol'));
+        // Escolher símbolo final aleatório
+        const randomSymbol = Math.floor(Math.random() * symbols.length);
 
-        // Parar o intervalo deste reel
-        const entry = intervals.find(e => e.reel === reel);
-        if (entry) clearInterval(entry.interval);
-
-        // Remover animação de rotação da imagem atual
-        const spinningImgs = reel.querySelectorAll('.symbol-img.spinning-image');
-        spinningImgs.forEach(img => img.classList.remove('spinning-image'));
-
-        // Exibir somente o símbolo final
-        cells.forEach((cell, idx) => cell.style.display = idx === targetIndex ? 'flex' : 'none');
+        // Ajustar posição da tira para parar com o símbolo escolhido visível
+        const symbolEl = reel.querySelector('.symbol');
+        const symbolHeight = symbolEl ? symbolEl.offsetHeight : 120; // fallback
+        const stopY = -(randomSymbol * symbolHeight);
+        reel.style.transition = 'transform 300ms ease-out';
+        reel.style.transform = `translateY(${stopY}px)`;
 
         // Determinar vitória (1 símbolo vencedor)
-        if (targetIndex === WIN_INDEX) {
+        if (randomSymbol === WIN_INDEX) {
             isWin = true;
         }
     }
