@@ -210,7 +210,7 @@ body {
     background-image: url('assets/slot-frame.png');
     background-size: 100% 100%;
     background-repeat: no-repeat;
-    background-position: 30% center;
+    background-position: calc(30% + 50px) center;
     position: relative;
     width: 416px; /* 520px - 20% */
     height: 416px; /* 520px - 20% */
