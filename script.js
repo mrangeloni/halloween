@@ -18,11 +18,11 @@ Símbolos sugeridos:
 
 // Caminhos locais esperados (adicione seus arquivos em assets/symbols/)
 const localSymbols = [
-    'assets/symbols/pumpkin.png',   // Símbolo 1 - Abóbora
-    'assets/symbols/witch.png',     // Símbolo 2 - Bruxa
-    'assets/symbols/cauldron.png',  // Símbolo 3 - Caldeirão
-    'assets/symbols/bat.png',       // Símbolo 4 - Morcego
-    'assets/symbols/prize.png'      // Símbolo 5 - Pote de prêmio
+    'assets/symbols/abobora-sempremio.png',   // Símbolo 1 - Abóbora sem prêmio
+    'assets/symbols/bruxa-sempremio.png',     // Símbolo 2 - Bruxa sem prêmio
+    'assets/symbols/pote-5brindes.png',       // Símbolo 3 - Pote de 5 brindes
+    'assets/symbols/caveira-sempremio.png',   // Símbolo 4 - Caveira sem prêmio
+    'assets/symbols/morcegos-sempremio.png'   // Símbolo 5 - Morcegos sem prêmio
 ];
 
 // Placeholders usados como fallback caso a imagem local não exista
