@@ -238,8 +238,8 @@ body {
 /* Viewport to clip the spinning reel inside the frame window */
 .reel-viewport {
     position: relative;
-    width: 264px; /* 220px * 1.2 to give breathing room */
-    aspect-ratio: 4 / 5; /* enforce 4:5 window */
+    width: 264px; /* ajuste conforme necessário */
+    aspect-ratio: 1 / 1; /* janela 1:1 */
     overflow: hidden; /* clip spinning content */
     display: flex;
     justify-content: center;
@@ -273,19 +273,17 @@ body {
     filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
 }
 
-/* Animação de giro */
-.reel.spinning {
-    animation: spin 0.1s linear infinite;
+/* Animação de rotação do próprio símbolo (opcional, melhora feedback visual em mobile) */
+.symbol-img.spinning {
+    animation: imgSpin 0.6s linear infinite;
+}
+@keyframes imgSpin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 
-@keyframes spin {
-    0% {
-        transform: translateY(0);
-    }
-    100% {
-        transform: translateY(-100%);
-    }
-}
+/* Animação de giro */
+/* Removida a animação por translateY do container; agora o JS alterna as imagens diretamente */
 
 /* Ensure the frame overlays reels visually */
 .slot-frame {

@@ -157,13 +157,17 @@ async function spin() {
     }
     
     // Adicionar classe de animação
-    // Preparar rotação: resetar posição e iniciar animação apenas na tira de símbolos (.reel)
+    // Preparar rotação: ciclar as imagens visíveis (compatível com mobile)
+    const intervals = [];
     reels.forEach(reel => {
-        reel.style.transition = 'none';
-        reel.style.transform = 'translateY(0)';
-        // Força reflow para aplicar imediatamente
-        void reel.offsetHeight;
-        reel.classList.add('spinning');
+        const img = reel.querySelector('.symbol-img');
+        let idx = 0;
+        img.classList.add('spinning');
+        intervals.push(setInterval(() => {
+            idx = (idx + 1) % symbols.length;
+            img.onerror = () => { img.src = fallbackSymbols[idx]; };
+            img.src = symbols[idx];
+        }, 100));
     });
     
     // Simular tempo de giro
@@ -174,22 +178,14 @@ async function spin() {
     for (let i = 0; i < reels.length; i++) {
         await sleep(300);
         const reel = reels[i];
-        reel.classList.remove('spinning');
-
-        // Escolher símbolo final aleatório
+        const img = reel.querySelector('.symbol-img');
+        // Escolher símbolo final
         const randomSymbol = Math.floor(Math.random() * symbols.length);
-
-        // Ajustar posição da tira para parar com o símbolo escolhido visível
-        const symbolEl = reel.querySelector('.symbol');
-        const symbolHeight = symbolEl ? symbolEl.offsetHeight : 120; // fallback
-        const stopY = -(randomSymbol * symbolHeight);
-        reel.style.transition = 'transform 300ms ease-out';
-        reel.style.transform = `translateY(${stopY}px)`;
-
-        // Determinar vitória (1 símbolo vencedor)
-        if (randomSymbol === WIN_INDEX) {
-            isWin = true;
-        }
+        img.classList.remove('spinning');
+        clearInterval(intervals[i]);
+        img.onerror = () => { img.src = fallbackSymbols[randomSymbol]; };
+        img.src = symbols[randomSymbol];
+        if (randomSymbol === WIN_INDEX) isWin = true;
     }
     
     // Aguardar um pouco antes de mostrar o resultado
