@@ -156,20 +156,15 @@ async function spin() {
         console.log('Erro ao tocar som:', e);
     }
     
-    // MODO B: ciclar a imagem visível (não move o container)
-    const intervals = [];
+    // Adicionar classe de animação
+    // Preparar rotação: animar a tira do reel (compatível desktop/mobile)
     reels.forEach(reel => {
-        const imgs = reel.querySelectorAll('.symbol-img');
-        const displayImg = imgs[0]; // primeira imagem visível no viewport
-        let idx = 0;
-        if (displayImg) {
-            displayImg.classList.add('spinning');
-            intervals.push(setInterval(() => {
-                idx = (idx + 1) % symbols.length;
-                displayImg.onerror = () => { displayImg.src = fallbackSymbols[idx]; };
-                displayImg.src = symbols[idx];
-            }, 100));
-        }
+        reel.style.transition = 'none';
+        reel.style.transform = 'translateY(0)';
+        void reel.offsetHeight; // reflow
+        reel.classList.add('spinning');
+        const img = reel.querySelector('.symbol-img');
+        if (img) img.classList.add('spinning');
     });
     
     // Simular tempo de giro
@@ -179,17 +174,17 @@ async function spin() {
     let isWin = false;
     for (let i = 0; i < reels.length; i++) {
         await sleep(300);
-        const reel = reels[i];
-        const imgs = reel.querySelectorAll('.symbol-img');
-        const displayImg = imgs[0];
-        const stopIdx = Math.floor(Math.random() * symbols.length);
-        if (displayImg) {
-            displayImg.classList.remove('spinning');
-            clearInterval(intervals[i]);
-            displayImg.onerror = () => { displayImg.src = fallbackSymbols[stopIdx]; };
-            displayImg.src = symbols[stopIdx];
-        }
-        if (stopIdx === WIN_INDEX) isWin = true;
+    const reel = reels[i];
+    reel.classList.remove('spinning');
+    const img = reel.querySelector('.symbol-img');
+    if (img) img.classList.remove('spinning');
+        // Escolher símbolo final
+        const randomSymbol = Math.floor(Math.random() * symbols.length);
+        // Parar suavemente no símbolo escolhido (cada símbolo = 20% da altura do reel)
+        const stopPct = -randomSymbol * 20; // -20%, -40%, ...
+        reel.style.transition = 'transform 300ms ease-out';
+        reel.style.transform = `translateY(${stopPct}%)`;
+        if (randomSymbol === WIN_INDEX) isWin = true;
     }
     
     // Aguardar um pouco antes de mostrar o resultado
