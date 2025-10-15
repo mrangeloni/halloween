@@ -46,10 +46,6 @@ body {
     overflow-x: hidden;
     position: relative;
     color: #fff;
-    padding-top: env(safe-area-inset-top);
-    padding-right: env(safe-area-inset-right);
-    padding-bottom: env(safe-area-inset-bottom);
-    padding-left: env(safe-area-inset-left);
 }
 :root { --app-max-width: 500px; }
 
@@ -71,7 +67,16 @@ body {
 }
 
 /* Morcegos animados */
-.bat { display: none; }
+.bat {
+    position: fixed;
+    width: 40px;
+    height: 30px;
+    background-color: #000;
+    clip-path: polygon(50% 0%, 0% 40%, 20% 100%, 40% 40%, 50% 50%, 60% 40%, 80% 100%, 100% 40%);
+    z-index: 2;
+    animation: fly 15s infinite ease-in-out;
+    opacity: 0.8;
+}
 
 .bat1 { top: 10%; left: calc(50% - (var(--app-max-width) / 2) + 20px); animation-delay: 0s; }
 
@@ -106,7 +111,7 @@ body {
     position: relative;
     z-index: 10;
     text-align: center;
-    padding: calc(20px + env(safe-area-inset-top)) 20px 20px 20px;
+    padding: 20px;
     max-width: var(--app-max-width);
     width: 100%;
     margin: 0 auto;
@@ -118,20 +123,23 @@ body {
 
 .slot-header {
     background: linear-gradient(180deg, #8b4513 0%, #6b3410 50%, #4a2408 100%);
-    border: 4px solid #ff8c00;
-    border-radius: 24px 24px 0 0;
-    padding: 16px 12px;
-    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.45), inset 0 -3px 8px rgba(0, 0, 0, 0.25);
+    border: 6px solid #ff8c00;
+    border-radius: 100px 100px 0 0;
+    padding: 30px 20px;
+    box-shadow: 
+        0 8px 20px rgba(0, 0, 0, 0.5),
+        inset 0 -4px 10px rgba(0, 0, 0, 0.3);
     position: relative;
-    margin: 24px auto -6px auto;
-    max-width: var(--app-max-width);
-    text-align: center;
+    margin-bottom: -10px;
 }
 
 .title {
-    font-size: 2.4em;
+    font-size: 3.5em;
     color: #ffa500;
-    text-shadow: 2px 2px 0 #ff6600, 4px 4px 0 #cc5200, 6px 6px 16px rgba(0, 0, 0, 0.8);
+    text-shadow: 
+        3px 3px 0 #ff6600,
+        6px 6px 0 #cc5200,
+        9px 9px 20px rgba(0, 0, 0, 0.8);
     line-height: 0.9;
     letter-spacing: 2px;
 }
@@ -141,23 +149,28 @@ body {
     color: #ffcc66;
 }
 
+/* ========================================
+   CONTADOR DE TENTATIVAS
+   ======================================== */
+
 .attempts-counter {
-    border: 2px solid #ff8c00;
-    border-radius: 12px;
-    padding: 8px 16px;
-    margin: 16px auto;
-    max-width: 280px;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.5);
+    background: rgba(139, 69, 19, 0.8);
+    border: 3px solid #ff8c00;
+    border-radius: 15px;
+    padding: 10px 20px;
+    margin: 20px auto;
+    max-width: 300px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
 }
 
 .attempts-counter p {
-    font-size: 1.1em;
+    font-size: 1.2em;
     color: #ffa500;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
 }
 
 .attempts-counter span {
-    font-size: 1.3em;
+    font-size: 1.5em;
     color: #ffff00;
     font-weight: bold;
 }
@@ -294,25 +307,37 @@ body {
 
 .spin-button {
     background: linear-gradient(180deg, #ffa500 0%, #ff8c00 50%, #ff6600 100%);
-    border: 4px solid #8b4513;
-    border-radius: 40px;
-    padding: 16px 40px;
-    font-size: 1.6em;
+    border: 6px solid #8b4513;
+    border-radius: 50px;
+    padding: 20px 60px;
+    font-size: 2em;
     font-weight: bold;
     color: #4a2408;
-    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
+    text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.5);
     cursor: pointer;
-    margin: 24px auto;
+    margin: 30px auto;
     display: block;
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5), inset 0 -3px 8px rgba(0, 0, 0, 0.3);
+    box-shadow: 
+        0 8px 20px rgba(0, 0, 0, 0.5),
+        inset 0 -4px 10px rgba(0, 0, 0, 0.3);
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
 }
 
-.spin-button:hover { transform: scale(1.03); box-shadow: 0 8px 22px rgba(255, 140, 0, 0.75), inset 0 -3px 8px rgba(0, 0, 0, 0.3); }
+.spin-button:hover {
+    transform: scale(1.05);
+    box-shadow: 
+        0 10px 30px rgba(255, 140, 0, 0.8),
+        inset 0 -4px 10px rgba(0, 0, 0, 0.3);
+}
 
-.spin-button:active { transform: scale(0.97); box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5), inset 0 4px 10px rgba(0, 0, 0, 0.5); }
+.spin-button:active {
+    transform: scale(0.95);
+    box-shadow: 
+        0 4px 10px rgba(0, 0, 0, 0.5),
+        inset 0 4px 10px rgba(0, 0, 0, 0.5);
+}
 
 .spin-button:disabled {
     opacity: 0.5;
@@ -320,7 +345,17 @@ body {
     transform: scale(1);
 }
 
-.spin-button::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent); transform: rotate(45deg); animation: shine 3s infinite; }
+.spin-button::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transform: rotate(45deg);
+    animation: shine 3s infinite;
+}
 
 @keyframes shine {
     0% {
@@ -366,7 +401,7 @@ body {
    ======================================== */
 
 .encouragement {
-    font-size: 1.3em;
+    font-size: 1.5em;
     color: #ffa500;
     text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
     margin-top: 20px;
@@ -385,46 +420,19 @@ body {
 }
 
 /* ========================================
-   RODAPÉ (REGRAS E CONDIÇÕES)
+   DECORAÇÕES DE HALLOWEEN
    ======================================== */
 
-.site-footer {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    margin-top: 20px;
-    padding-bottom: env(safe-area-inset-bottom);
-}
-
-.footer-content {
+.decorations {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
     width: var(--app-max-width);
-    padding: 16px 20px 28px 20px;
-    background: rgba(0, 0, 0, 0.35);
-    border-top: 3px solid #ff8c00;
-    box-shadow: 0 -6px 16px rgba(0,0,0,0.4);
-    border-radius: 12px 12px 0 0;
+    height: 200px;
+    z-index: 5;
+    pointer-events: none;
 }
-
-.footer-pumpkins {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-}
-
-.footer-rules {
-    text-align: left;
-    color: #ffd27f;
-    font-size: 0.9em;
-}
-.footer-rules strong {
-    color: #ffa500;
-}
-.footer-rules ul {
-    margin: 8px 0 0 18px;
-    padding: 0;
-}
-.footer-rules li { margin-bottom: 6px; }
 
 .pumpkin {
     position: absolute;
