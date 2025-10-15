@@ -139,16 +139,15 @@ body {
    CABEÇALHO DA SLOT MACHINE
    ======================================== */
 
-.slot-header {
-    background: linear-gradient(180deg, #8b4513 0%, #6b3410 50%, #4a2408 100%);
+.slot-frame {
+    background-image: url('assets/slot-frame.png');
     background-size: 95% 95%;
-    border-radius: 100px 100px 0 0;
-    padding: 30px 20px;
-    box-shadow: 
+    background-repeat: no-repeat;
+    background-position: center;
+    position: relative;
     width: clamp(300px, 90vw, 416px); /* responsivo no mobile */
     aspect-ratio: 1 / 1; /* mantém 1:1 */
     margin: -15px auto 0 auto;
-    margin-bottom: -10px;
 }
 
 .title {
@@ -221,23 +220,22 @@ body {
 }
 
 .reels-container {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%) translate(var(--reels-offset-x, 0), var(--reels-offset-y, 0));
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 100%;
-    height: 100%;
     gap: 0;
     overflow: visible; /* container allows positioning */
-    position: static;
     z-index: 1; /* under the frame overlay */
-    padding: 0; /* remover deslocamentos que causam desalinhamento no mobile */
-
 }
 
 /* Viewport to clip the spinning reel inside the frame window */
 .reel-viewport {
     position: relative;
-    width: clamp(180px, 40vw, 264px); /* responsivo: mobile a desktop */
+    width: min(65%, 300px); /* relativo à moldura e com teto */
     aspect-ratio: 1 / 1; /* janela 1:1 */
     overflow: hidden; /* clip spinning content */
     display: flex;
@@ -288,7 +286,10 @@ body {
 
 /* Ajustes específicos para telas pequenas (se necessário, manter sem offsets) */
 @media (max-width: 480px) {
-    .reels-container { padding: 0; }
+    :root {
+        --reels-offset-x: 0; /* ajuste fino se necessário: ex 4px */
+        --reels-offset-y: 0; /* ajuste fino se necessário: ex -6px */
+    }
 }
 
 /* Ensure the frame overlays reels visually */
