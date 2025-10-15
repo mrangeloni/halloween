@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slot Machine de Halloween - Gire e Ganhe!</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Morcegos animados -->
+    <div class="bat bat1"></div>
+    <div class="bat bat2"></div>
+    <div class="bat bat3"></div>
+    <div class="bat bat4"></div>
+    <div class="bat bat5"></div>
+    
+    <!-- Lua de fundo -->
+    <div class="moon"></div>
+
+    <!-- Container principal -->
+    <div class="container">
+        <!-- Cabeçalho da máquina -->
+        <div class="slot-header">
+            <h1 class="title">TRICK<br><span class="or">- OR -</span><br>TREAT</h1>
+        </div>
+
+        <!-- Contador de tentativas -->
+        <div class="attempts-counter">
+            <p>Tentativas restantes: <span id="attempts">5</span></p>
+        </div>
+
+        <!-- Máquina de slot -->
+        <div class="slot-machine">
+            <div class="slot-frame">
+                <div class="reels-container">
+                    <div class="reel" id="reel1">
+                        <div class="symbol"><img src="" alt="Símbolo 1" class="symbol-img" data-symbol="symbol1"></div>
+                        <div class="symbol"><img src="" alt="Símbolo 2" class="symbol-img" data-symbol="symbol2"></div>
+                        <div class="symbol"><img src="" alt="Símbolo 3" class="symbol-img" data-symbol="symbol3"></div>
+                        <div class="symbol"><img src="" alt="Símbolo 4" class="symbol-img" data-symbol="symbol4"></div>
+                        <div class="symbol"><img src="" alt="Símbolo 5" class="symbol-img" data-symbol="symbol5"></div>
+                    </div>
+                    <div class="reel" id="reel2">
+                        <div class="symbol"><img src="" alt="Símbolo 1" class="symbol-img" data-symbol="symbol1"></div>
+                        <div class="symbol"><img src="" alt="Símbolo 2" class="symbol-img" data-symbol="symbol2"></div>
+                        <div class="symbol"><img src="" alt="Símbolo 3" class="symbol-img" data-symbol="symbol3"></div>
+                        <div class="symbol"><img src="" alt="Símbolo 4" class="symbol-img" data-symbol="symbol4"></div>
+                        <div class="symbol"><img src="" alt="Símbolo 5" class="symbol-img" data-symbol="symbol5"></div>
+                    </div>
+                    <div class="reel" id="reel3">
+                        <div class="symbol"><img src="" alt="Símbolo 1" class="symbol-img" data-symbol="symbol1"></div>
+                        <div class="symbol"><img src="" alt="Símbolo 2" class="symbol-img" data-symbol="symbol2"></div>
+                        <div class="symbol"><img src="" alt="Símbolo 3" class="symbol-img" data-symbol="symbol3"></div>
+                        <div class="symbol"><img src="" alt="Símbolo 4" class="symbol-img" data-symbol="symbol4"></div>
+                        <div class="symbol"><img src="" alt="Símbolo 5" class="symbol-img" data-symbol="symbol5"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botão de girar -->
+        <button class="spin-button" id="spinButton">
+            <span class="spin-text">GIRAR</span>
+        </button>
+
+        <!-- Alavanca decorativa -->
+        <div class="lever"></div>
+
+        <!-- Mensagem de incentivo -->
+        <p class="encouragement" id="encouragement">Gire e ganhe!</p>
+    </div>
+
+    <!-- Decorações de Halloween -->
+    <div class="decorations">
+        <div class="pumpkin pumpkin-left"></div>
+        <div class="pumpkin pumpkin-right"></div>
+        <div class="cauldron cauldron-left"></div>
+        <div class="witch-hat"></div>
+    </div>
+
+    <!-- Modal de prêmio -->
+    <div class="modal" id="prizeModal">
+        <div class="modal-content">
+            <div class="prize-banner">
+                <!-- INSTRUÇÕES: Insira aqui a URL da imagem do banner de prêmio
+                     Tamanho recomendado: 600x300px (proporção 2:1)
+                     Formato: PNG com fundo transparente ou JPG -->
+                <img src="" alt="Banner de Prêmio" id="prizeBannerImg">
+            </div>
+            <button class="modal-button" id="nextRoundButton">Próxima rodada</button>
+        </div>
+    </div>
+
+    <!-- Link para regras -->
+    <div class="rules-link">
+        <a href="#" id="rulesLink">Regras e Condições</a>
+    </div>
+
+    <!-- Modal de regras -->
+    <div class="modal" id="rulesModal">
+        <div class="modal-content rules-content">
+            <h2>Regras do Jogo</h2>
+            <p>🎃 Você tem 5 tentativas para girar a slot machine de Halloween!</p>
+            <p>🎰 Gire as bobinas e descubra qual prêmio você ganhou.</p>
+            <p>🏆 Na 4ª tentativa, você ganhará um MEGA PRÊMIO especial!</p>
+            <p>🎁 Cada giro revela um prêmio único.</p>
+            <p>👻 Boa sorte e divirta-se!</p>
+            <button class="modal-button" id="closeRulesButton">Fechar</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
