@@ -157,17 +157,12 @@ async function spin() {
     }
     
     // Adicionar classe de animação
-    // Preparar rotação: ciclar as imagens visíveis (compatível com mobile)
-    const intervals = [];
+    // Preparar rotação: animar a tira do reel (compatível desktop/mobile)
     reels.forEach(reel => {
-        const img = reel.querySelector('.symbol-img');
-        let idx = 0;
-        img.classList.add('spinning');
-        intervals.push(setInterval(() => {
-            idx = (idx + 1) % symbols.length;
-            img.onerror = () => { img.src = fallbackSymbols[idx]; };
-            img.src = symbols[idx];
-        }, 100));
+        reel.style.transition = 'none';
+        reel.style.transform = 'translateY(0)';
+        void reel.offsetHeight; // reflow
+        reel.classList.add('spinning');
     });
     
     // Simular tempo de giro
@@ -178,13 +173,13 @@ async function spin() {
     for (let i = 0; i < reels.length; i++) {
         await sleep(300);
         const reel = reels[i];
-        const img = reel.querySelector('.symbol-img');
+        reel.classList.remove('spinning');
         // Escolher símbolo final
         const randomSymbol = Math.floor(Math.random() * symbols.length);
-        img.classList.remove('spinning');
-        clearInterval(intervals[i]);
-        img.onerror = () => { img.src = fallbackSymbols[randomSymbol]; };
-        img.src = symbols[randomSymbol];
+        // Parar suavemente no símbolo escolhido (cada símbolo = 20% da altura do reel)
+        const stopPct = -randomSymbol * 20; // -20%, -40%, ...
+        reel.style.transition = 'transform 300ms ease-out';
+        reel.style.transform = `translateY(${stopPct}%)`;
         if (randomSymbol === WIN_INDEX) isWin = true;
     }
     
