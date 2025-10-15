@@ -208,7 +208,7 @@ body {
 
 .slot-frame {
     background-image: url('assets/slot-frame.png');
-    background-size: 80% 80%; /* Diminui imagem em 20% */
+    background-size: 100% 100%;
     background-repeat: no-repeat;
     background-position: center;
     position: relative;
