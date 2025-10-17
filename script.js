@@ -70,6 +70,17 @@ let isSpinning = false;
 // Vitória quando a imagem selecionada for o pote de 5 brindes
 const WIN_NAME = 'pote-5brindes';
 
+function getWinIndex() {
+    const idx = symbols.findIndex(src => typeof src === 'string' && src.includes(WIN_NAME));
+    return idx >= 0 ? idx : 0;
+}
+
+function pickTargetIndex(attemptNumber) {
+    // 3ª tentativa: vitória garantida
+    if (attemptNumber === 3) return getWinIndex();
+    // Demais tentativas: aleatório uniforme entre todos os símbolos
+    return Math.floor(Math.random() * symbols.length);
+}
 // ========================================
 // ELEMENTOS DOM
 // ========================================
