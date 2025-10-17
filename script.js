@@ -60,7 +60,7 @@ let currentAttempt = 0;
 let isSpinning = false;
 
 // Para garantir vitória 1x a cada 5 tentativas
-let predeterminedWinAttempt = randInt(1, 5);
+let predeterminedWinAttempt = 3; // 3ª tentativa garante vitória
 
 // --------- DOM ---------
 const spinButton       = document.getElementById('spinButton');
@@ -279,11 +279,12 @@ async function spin() {
   // Termina som de giro
   try { sounds.spin.pause(); } catch (_) {}
 
-  // Verifica vitória
-  const isWin = (targetBaseIndex === winIdx);
+  // Verifica símbolo central ao terminar e vitória
+  const landedBaseIndex = getCenterBaseIndex(offset);
+  const isWin = (landedBaseIndex === winIdx);
 
-  // Mostra modal correto
-  showPrizeModal(isWin);
+  // Mostra modal com imagem coerente do prêmio/símbolo
+  showPrizeModal(isWin, landedBaseIndex);
 
   isSpinning = false;
   if (attemptsLeft > 0) {
@@ -381,17 +382,17 @@ function updateEncouragement() {
 }
 
 // --------- Modais ---------
-function showPrizeModal(isWin) {
+function showPrizeModal(isWin, landedIndex) {
   try {
     if (isWin) { sounds.win.currentTime = 0; sounds.win.play(); }
     else       { sounds.lose.currentTime = 0; sounds.lose.play(); }
   } catch (_) {}
 
-  // Gera banner dinâmico com texto certo (mantendo seu layout/modal)
-  const text = isWin ? 'VOCÊ GANHOU 6 JOIAS GRÁTIS' : 'VOCÊ PERDEU';
-  const bg   = isWin ? '#ffa500' : '#8b4513';
-  prizeBannerImg.src = makeBannerDataURL(text, bg);
-  prizeBannerImg.alt = text;
+  // Imagem coerente com o símbolo que parou no centro
+  const imgSrc = getPrizeImageSrc(landedIndex);
+  const altTxt = getSymbolName(landedIndex, isWin);
+  prizeBannerImg.src = imgSrc;
+  prizeBannerImg.alt = altTxt;
 
   // Mostra modal
   prizeModal.classList.add('show');
@@ -416,7 +417,7 @@ nextRoundButton.addEventListener('click', () => {
     // Reiniciar rodada completa
     attemptsLeft = 5;
     currentAttempt = 0;
-    predeterminedWinAttempt = randInt(1, 5);
+    predeterminedWinAttempt = 3; // mantém regra da 3ª tentativa
     spinButton.disabled = false;
     spinButton.textContent = 'GIRAR';
     updateAttemptsDisplay();
@@ -492,4 +493,38 @@ function shadeColor(col, amt) {
   g = Math.max(Math.min(255,g),0);
   b = Math.max(Math.min(255,b),0);
   return `#${(r<<16 | g<<8 | b).toString(16).padStart(6,'0')}`;
+}
+
+// --------- Helpers: imagem coerente no popup ---------
+function getPrizeImageSrc(index) {
+  // Tenta na ordem: imagem carregada -> URL local -> placeholder -> banner gerado
+  const img = loadedImages[index];
+  if (img && img.src) return img.src;
+
+  const local = symbols[index];
+  if (typeof local === 'string') return local;
+
+  const placeholder = fallbackSymbols[index] || null;
+  if (placeholder) return placeholder;
+
+  const isWin = getSymbolBaseName(index).includes(WIN_NAME);
+  return makeBannerDataURL(isWin ? 'VOCÊ GANHOU 6 JOIAS GRÁTIS' : 'VOCÊ PERDEU', isWin ? '#ffa500' : '#8b4513');
+}
+
+function getSymbolName(index, isWin) {
+  const base = getSymbolBaseName(index);
+  if (isWin) return 'Prêmio: 6 Joias Grátis';
+  // nome amigável por heurística do arquivo
+  if (base.includes('abobora')) return 'Abóbora';
+  if (base.includes('bruxa')) return 'Bruxa';
+  if (base.includes('caveira')) return 'Caveira';
+  if (base.includes('morcegos')) return 'Morcegos';
+  if (base.includes('pote')) return 'Prêmio';
+  return 'Símbolo';
+}
+
+function getSymbolBaseName(index) {
+  const src = symbols[index] || '';
+  const last = typeof src === 'string' ? src.split('/').pop() : '';
+  return (last || '').toLowerCase();
 }
