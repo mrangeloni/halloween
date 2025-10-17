@@ -292,6 +292,15 @@ body {
     margin-left: -30px; /* desloca o slot 10px para a direita sem mover a moldura */
 }
 
+.reel-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+    background: rgba(45, 27, 78, 0.85);
+    border: 3px solid #8b4513;
+    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.7), 0 0 30px rgba(0,0,0,0.5);
+}
+
 .reel {
     width: 100%;
     height: 500%; /* 5 símbolos => 5x a altura do viewport */
@@ -302,6 +311,7 @@ body {
     position: relative;
     box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.7);
     will-change: transform;
+    display: none; /* oculto, canvas substitui */
 }
 
 .symbol {

@@ -74,64 +74,151 @@ const rulesLink        = document.getElementById('rulesLink');
 const closeRulesButton = document.getElementById('closeRulesButton');
 const prizeBannerImg   = document.getElementById('prizeBannerImg');
 
-// ÚNICO REEL (viewport -> reel)
+// ÚNICO REEL (canvas renderer)
 const reelViewport = document.querySelector('.reel-viewport');
-const reel         = document.getElementById('reel1');
+const reelCanvas   = document.getElementById('reelCanvas');
+const reelCtx      = reelCanvas ? reelCanvas.getContext('2d') : null;
 
-// --------- Motor da bobina ---------
-// Repetimos os símbolos para fazer loop contínuo
-const LOOPS = 12; // quantas vezes repetir a sequência (grande o suficiente p/ 2s de giro rápido)
-let repeated = [];        // vetor de índices base (0..4) repetidos
-let itemEls = [];         // elementos DOM correspondentes
-let symbolH = 0;          // altura (px) de um símbolo (igual à altura do viewport)
-let totalH = 0;           // altura total da trilha
-let offset = 0;           // deslocamento atual em px (0 = topo da trilha)
+// --------- Motor da bobina (Canvas) ---------
+const LOOPS = 12; // repetições lógicas para cálculo
+let repeated = [];         // vetor de índices base (0..4) repetidos
+let symbolH = 0;           // altura (px) de um símbolo (igual à altura do viewport)
+let symbolW = 0;           // largura do símbolo/viewport
+let totalH = 0;            // altura total da trilha
+let offset = 0;            // deslocamento atual em px (0 = topo da trilha)
 let rafId = null;
+
+// Imagens pré-carregadas para canvas
+const loadedImages = new Array(localSymbols.length).fill(null);
+const imageStatus  = new Array(localSymbols.length).fill('pending'); // 'ok' | 'fallback' | 'final'
+
+function preloadImages() {
+  localSymbols.forEach((_, idx) => {
+    const img = new Image();
+    img.decoding = 'async';
+    img.loading = 'eager';
+    let tryIdx = 0;
+    const candidates = [symbols[idx], fallbackSymbols[idx], FINAL_FALLBACK];
+    img.onerror = () => {
+      tryIdx++;
+      if (tryIdx < candidates.length) {
+        img.src = candidates[tryIdx];
+      } else {
+        imageStatus[idx] = 'final';
+      }
+    };
+    img.onload = () => {
+      imageStatus[idx] = tryIdx === 0 ? 'ok' : (tryIdx === 1 ? 'fallback' : 'final');
+      loadedImages[idx] = img;
+      // Redesenha se já temos dimensões
+      if (symbolH > 0) drawCanvas();
+    };
+    img.src = candidates[0];
+  });
+}
 
 // --------- Inicialização ---------
 function init() {
+  setupCanvasSize();
   buildReel();
+  preloadImages();
   updateAttemptsDisplay();
   updateEncouragement();
 }
 document.addEventListener('DOMContentLoaded', init);
+window.addEventListener('resize', () => {
+  const oldH = symbolH || reelViewport.clientHeight || 264;
+  setupCanvasSize();
+  const newH = reelViewport.clientHeight || 264;
+  const ratio = newH > 0 && oldH > 0 ? (newH / oldH) : 1;
+  offset *= ratio; // preserva posição relativa
+  buildReel();
+  normalizeOffset();
+  drawCanvas();
+});
 
 // Monta a trilha do rolo em loop contínuo
 function buildReel() {
-  reel.innerHTML = '';
-  itemEls = [];
   repeated = [];
-
-  // Altura 1:1 da janela já é definida via CSS; aqui medimos para usar em px
+  // Altura e largura da janela 1:1 já definidas; usamos para desenhar
   symbolH = Math.round(reelViewport.clientHeight);
-  if (symbolH === 0) {
-    // fallback se ainda não renderizou
-    symbolH = 260;
+  symbolW = Math.round(reelViewport.clientWidth);
+  if (symbolH === 0 || symbolW === 0) {
+    symbolH = symbolW = 264; // fallback padrão
   }
-
-  // Cria LOOPS vezes a sequência (0..4)
+  // repete a sequência base LOOPS vezes
   for (let l = 0; l < LOOPS; l++) {
     for (let i = 0; i < symbols.length; i++) {
-      const wrap = document.createElement('div');
-      wrap.className = 'symbol';
-      wrap.style.height = `${symbolH}px`;
-
-  const img = document.createElement('img');
-      img.className = 'symbol-img';
-      img.alt = `Símbolo ${i + 1}`;
-  setSymbolImage(img, i);
-
-      wrap.appendChild(img);
-      reel.appendChild(wrap);
-
       repeated.push(i);
-      itemEls.push(wrap);
     }
   }
-
   totalH = repeated.length * symbolH;
   offset = 0;
-  applyTransform();
+}
+
+function setupCanvasSize() {
+  if (!reelCanvas) return;
+  // Ajusta o canvas em pixel ratio para nitidez
+  const rect = reelViewport.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  reelCanvas.width  = Math.max(1, Math.floor(rect.width * dpr));
+  reelCanvas.height = Math.max(1, Math.floor(rect.height * dpr));
+  reelCanvas.style.width  = `${Math.floor(rect.width)}px`;
+  reelCanvas.style.height = `${Math.floor(rect.height)}px`;
+  if (reelCtx) reelCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+function drawCanvas() {
+  if (!reelCtx) return;
+  // Fundo + moldura interna igual ao CSS
+  reelCtx.clearRect(0, 0, reelCanvas.width, reelCanvas.height);
+
+  const w = reelCanvas.clientWidth;
+  const h = reelCanvas.clientHeight;
+
+  // fundo já é via CSS, aqui só clipamos a janela
+  reelCtx.save();
+  reelCtx.beginPath();
+  reelCtx.rect(0, 0, w, h);
+  reelCtx.clip();
+
+  // quantas linhas precisamos desenhar para cobrir a janela? (+1 margem)
+  const firstRow = Math.floor(offset / symbolH);
+  const yStart = - (offset - firstRow * symbolH);
+  // desenha de yStart até cobrir altura
+  let y = yStart;
+  let row = firstRow;
+  while (y < h + symbolH) {
+    const baseIdx = repeated[(row % repeated.length + repeated.length) % repeated.length];
+    const img = loadedImages[baseIdx];
+    // desenha imagem centralizada
+    if (img) {
+      // calcula tamanho mantendo aspect-ratio, cabendo em 90% do quadrado
+      const pad = Math.floor(Math.min(w, h) * 0.05);
+      const boxW = w - pad * 2;
+      const boxH = symbolH - pad * 2;
+      const iw = img.naturalWidth || 200;
+      const ih = img.naturalHeight || 200;
+      const scale = Math.min(boxW / iw, boxH / ih);
+      const dw = Math.floor(iw * scale);
+      const dh = Math.floor(ih * scale);
+      const dx = Math.floor((w - dw) / 2);
+      const dy = Math.floor(y + (symbolH - dh) / 2);
+      reelCtx.drawImage(img, dx, dy, dw, dh);
+    }
+
+    // opcional: leve linha separadora
+    // reelCtx.strokeStyle = 'rgba(0,0,0,0.25)';
+    // reelCtx.beginPath();
+    // reelCtx.moveTo(0, Math.floor(y + symbolH) + 0.5);
+    // reelCtx.lineTo(w, Math.floor(y + symbolH) + 0.5);
+    // reelCtx.stroke();
+
+    y += symbolH;
+    row += 1;
+  }
+
+  reelCtx.restore();
 }
 
 // --------- Girar ---------
@@ -178,7 +265,7 @@ async function spin() {
 
       offset = lerp(startOffsetNorm(startOffset), endOffset, eased);
       normalizeOffset();
-      applyTransform();
+      drawCanvas();
 
       if (t < 1) {
         rafId = requestAnimationFrame(step);
@@ -252,10 +339,7 @@ function getCenterBaseIndex(offPx) {
   return repeated[idx] % symbols.length;
 }
 
-// Aplica o transform conforme o offset atual
-function applyTransform() {
-  reel.style.transform = `translateY(${-offset}px)`;
-}
+// DOM reel não é mais usado; mantido como fallback
 
 // Mantém o offset dentro do intervalo [0, totalH)
 function normalizeOffset() {

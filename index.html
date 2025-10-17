@@ -34,13 +34,17 @@
             <div class="slot-frame">
                 <div class="reels-container">
                 <div class="reel-viewport">
-                <div class="reel" id="reel1">
-                    <div class="symbol"><img src="" alt="Símbolo 1" class="symbol-img" data-symbol="symbol1"></div>
-                    <div class="symbol"><img src="" alt="Símbolo 2" class="symbol-img" data-symbol="symbol2"></div>
-                    <div class="symbol"><img src="" alt="Símbolo 3" class="symbol-img" data-symbol="symbol3"></div>
-                    <div class="symbol"><img src="" alt="Símbolo 4" class="symbol-img" data-symbol="symbol4"></div>
-                    <div class="symbol"><img src="" alt="Símbolo 5" class="symbol-img" data-symbol="symbol5"></div>
-                </div>
+                  <!-- Canvas renderer (novo): desenha os símbolos e o giro sem bugs de imagem -->
+                  <canvas class="reel-canvas" id="reelCanvas"></canvas>
+
+                  <!-- Reel DOM antigo (mantido como fallback/backup, oculto por CSS) -->
+                  <div class="reel" id="reel1" aria-hidden="true">
+                      <div class="symbol"><img src="" alt="Símbolo 1" class="symbol-img" data-symbol="symbol1"></div>
+                      <div class="symbol"><img src="" alt="Símbolo 2" class="symbol-img" data-symbol="symbol2"></div>
+                      <div class="symbol"><img src="" alt="Símbolo 3" class="symbol-img" data-symbol="symbol3"></div>
+                      <div class="symbol"><img src="" alt="Símbolo 4" class="symbol-img" data-symbol="symbol4"></div>
+                      <div class="symbol"><img src="" alt="Símbolo 5" class="symbol-img" data-symbol="symbol5"></div>
+                  </div>
                 </div>
                 </div>
             </div>
