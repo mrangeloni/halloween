@@ -67,7 +67,8 @@ Object.values(sounds).forEach(sound => {
 let attemptsLeft = 5;
 let currentAttempt = 0;
 let isSpinning = false;
-const WIN_INDEX = 2; // índice do 'pote-5brindes' no array localSymbols
+// Vitória quando a imagem selecionada for o pote de 5 brindes
+const WIN_NAME = 'pote-5brindes';
 
 // ========================================
 // ELEMENTOS DOM
@@ -184,7 +185,10 @@ async function spin() {
         const stopPct = -randomSymbol * 20; // -20%, -40%, ...
         reel.style.transition = 'transform 300ms ease-out';
         reel.style.transform = `translateY(${stopPct}%)`;
-        if (randomSymbol === WIN_INDEX) isWin = true;
+        const selectedSrc = symbols[randomSymbol];
+        if (typeof selectedSrc === 'string' && selectedSrc.includes(WIN_NAME)) {
+            isWin = true;
+        }
     }
     
     // Aguardar um pouco antes de mostrar o resultado
