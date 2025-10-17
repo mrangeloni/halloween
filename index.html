@@ -33,7 +33,15 @@
         <div class="slot-machine">
             <div class="slot-frame">
                 <div class="reels-container">
-                    <!-- Os rolos serão gerados dinamicamente via JavaScript -->
+                <div class="reel-viewport">
+                <div class="reel" id="reel1">
+                    <div class="symbol"><img src="" alt="Símbolo 1" class="symbol-img" data-symbol="symbol1"></div>
+                    <div class="symbol"><img src="" alt="Símbolo 2" class="symbol-img" data-symbol="symbol2"></div>
+                    <div class="symbol"><img src="" alt="Símbolo 3" class="symbol-img" data-symbol="symbol3"></div>
+                    <div class="symbol"><img src="" alt="Símbolo 4" class="symbol-img" data-symbol="symbol4"></div>
+                    <div class="symbol"><img src="" alt="Símbolo 5" class="symbol-img" data-symbol="symbol5"></div>
+                </div>
+                </div>
                 </div>
             </div>
         </div>
@@ -42,6 +50,8 @@
         <button class="spin-button" id="spinButton">
             <span class="spin-text">GIRAR</span>
         </button>
+
+        <!-- Alavanca decorativa -->
 
         <!-- Mensagem de incentivo -->
         <p class="encouragement" id="encouragement">Gire e ganhe!</p>
@@ -52,14 +62,16 @@
         <!-- Removidos: abóboras, caldeirão animado e chapéu -->
     </div>
 
-    <!-- Modal de prêmio/resultado -->
+    <!-- Modal de prêmio -->
     <div class="modal" id="prizeModal">
         <div class="modal-content">
-            <p id="prizeModalText" class="modal-text"></p> <!-- Novo elemento para o texto -->
             <div class="prize-banner">
+                <!-- INSTRUÇÕES: Insira aqui a URL da imagem do banner de prêmio
+                     Tamanho recomendado: 600x300px (proporção 2:1)
+                     Formato: PNG com fundo transparente ou JPG -->
                 <img src="" alt="Banner de Prêmio" id="prizeBannerImg">
             </div>
-            <button class="modal-button" id="nextRoundButton">TENTAR NOVAMENTE</button>
+            <button class="modal-button" id="nextRoundButton">Próxima rodada</button>
         </div>
     </div>
 

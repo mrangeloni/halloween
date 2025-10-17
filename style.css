@@ -271,28 +271,30 @@ body {
     align-items: center;
     width: 100%;
     height: 100%;
-    gap: 10px; /* Espaçamento entre os rolos */
-    overflow: hidden; /* Oculta o que estiver fora do container */
-    position: relative; /* Para posicionamento dos rolos */
-    z-index: 1; /* Abaixo da moldura */
+    gap: 0;
+    overflow: visible; /* container allows positioning */
+    position: static;
+    z-index: 1; /* under the frame overlay */
     padding-top: 80px;
     padding-right: 35px;
+
 }
 
-/* Viewport para recortar o rolo giratório dentro da janela da moldura */
+/* Viewport to clip the spinning reel inside the frame window */
 .reel-viewport {
     position: relative;
-    width: 80px; /* Ajustado para 3 rolos */
-    height: 80px; /* Altura do viewport */
-    overflow: hidden; /* Recorta o conteúdo giratório */
+    width: 264px; /* tamanho fixo para desktop e mobile */
+    aspect-ratio: 1 / 1; /* janela 1:1 */
+    overflow: hidden; /* clip spinning content */
     display: flex;
     justify-content: center;
     align-items: center;
+    margin-left: -30px; /* desloca o slot 10px para a direita sem mover a moldura */
 }
 
 .reel {
     width: 100%;
-    height: auto; /* A altura será definida pelo conteúdo */
+    height: 500%; /* 5 símbolos => 5x a altura do viewport */
     background: rgba(45, 27, 78, 0.85);
     border: 3px solid #8b4513;
     box-shadow: 0 0 30px rgba(0,0,0,0.5);
@@ -304,7 +306,7 @@ body {
 
 .symbol {
     width: 100%;
-    height: 80px; /* Altura fixa para cada símbolo */
+    height: 20%; /* cada símbolo ocupa exatamente a janela (1/5 do reel) */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -318,14 +320,49 @@ body {
     filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
 }
 
-/* Animação de giro */
-.reel.spinning {
-    animation: spin 0.1s linear infinite; /* Animação mais rápida para o giro */
+/* As imagens também giram durante o spin para dar o efeito desejado */
+.symbol-img.spinning {
+    animation: imgSpin 0.6s linear infinite;
+}
+@keyframes imgSpin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 
+/* Animação de rotação do próprio símbolo (opcional, melhora feedback visual em mobile) */
+/* Removida rotação do símbolo individual; a bobina inteira gira */
+
+/* Animação de giro */
+.reel.spinning {
+    animation: spin 0.12s linear infinite;
+}
 @keyframes spin {
-    from { transform: translateY(0); }
-    to { transform: translateY(-33.33%); } /* Gira um conjunto de símbolos */
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-100%); }
+}
+
+@media (max-width: 480px) {
+    .reels-container {
+        padding-top: 40px; /* menos padding no mobile */
+        padding-right: 0;
+    }
+}
+
+/* Ensure the frame overlays reels visually */
+.slot-frame {
+    position: relative;
+    z-index: 2;
+}
+.slot-frame::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: inherit; /* reuse same frame image */
+    background-size: inherit;
+    background-repeat: inherit;
+    background-position: inherit;
+    pointer-events: none;
+    z-index: 3; /* top-most overlay */
 }
 
 /* ========================================
@@ -333,49 +370,94 @@ body {
    ======================================== */
 
 .spin-button {
-    background: linear-gradient(180deg, #ff8c00 0%, #ff6600 100%);
-    border: 3px solid #ffcc00;
-    border-radius: 15px;
-    padding: 15px 30px;
-    margin-top: 20px;
-    cursor: pointer;
+    background: linear-gradient(180deg, #ffa500 0%, #ff8c00 50%, #ff6600 100%);
+    border: 6px solid #8b4513;
+    border-radius: 50px;
+    padding: 20px 60px;
     font-size: 2em;
-    color: #fff;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.5);
+    font-weight: bold;
+    color: #4a2408;
+    text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    margin: 30px auto;
+    display: block;
+    box-shadow: 
+        0 8px 20px rgba(0, 0, 0, 0.5),
+        inset 0 -4px 10px rgba(0, 0, 0, 0.3);
     transition: all 0.3s ease;
-    outline: none;
     position: relative;
     overflow: hidden;
 }
 
 .spin-button:hover {
-    background: linear-gradient(180deg, #ff6600 0%, #ff8c00 100%);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.7);
-    transform: translateY(-2px);
+    transform: scale(1.05);
+    box-shadow: 
+        0 10px 30px rgba(255, 140, 0, 0.8),
+        inset 0 -4px 10px rgba(0, 0, 0, 0.3);
 }
 
 .spin-button:active {
-    transform: translateY(1px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    transform: scale(0.95);
+    box-shadow: 
+        0 4px 10px rgba(0, 0, 0, 0.5),
+        inset 0 4px 10px rgba(0, 0, 0, 0.5);
 }
 
 .spin-button:disabled {
-    background: linear-gradient(180deg, #555 0%, #333 100%);
-    border-color: #666;
+    opacity: 0.5;
     cursor: not-allowed;
-    box-shadow: none;
-    transform: none;
+    transform: scale(1);
 }
 
-.spin-button.game-over {
-    background: linear-gradient(180deg, #cc0000 0%, #990000 100%);
-    border-color: #ff0000;
+.spin-button::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transform: rotate(45deg);
+    animation: shine 3s infinite;
 }
 
-.spin-text {
-    position: relative;
-    z-index: 1;
+@keyframes shine {
+    0% {
+        left: -50%;
+    }
+    50%, 100% {
+        left: 150%;
+    }
+}
+
+/* ========================================
+   ALAVANCA DECORATIVA
+   ======================================== */
+
+.lever {
+    position: absolute;
+    right: -40px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 280px;
+    height: 280px;
+    background: rgba(45, 27, 78, 0.85);
+    border: 3px solid #8b4513;
+    box-shadow: 0 0 30px rgba(0,0,0,0.5);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+.lever::before {
+    content: '';
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 40px;
+    background: radial-gradient(circle, #ff0000 0%, #cc0000 100%);
+    border-radius: 50%;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
 }
 
 /* ========================================
@@ -383,226 +465,289 @@ body {
    ======================================== */
 
 .encouragement {
-    font-size: 1.1em;
-    color: #ffcc00;
-    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
-    margin-top: 15px;
+    font-size: 1.5em;
+    color: #ffa500;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+    margin-top: 20px;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.7;
+        transform: scale(1.05);
+    }
 }
 
 /* ========================================
-   DECORAÇÕES DE HALLOWEEN (REMOVIDAS)
+   DECORAÇÕES DE HALLOWEEN
    ======================================== */
 
 .decorations {
-    display: none; /* Oculta as decorações que não são mais usadas */
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: var(--app-max-width);
+    height: 200px;
+    z-index: 5;
+    pointer-events: none;
+}
+
+.pumpkin {
+    display: none !important;
+}
+
+.pumpkin {
+    position: absolute;
+    bottom: 20px;
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle, #ff8c00 0%, #ff6600 100%);
+    border-radius: 50% 50% 45% 45%;
+    box-shadow: 
+        inset -10px -10px 20px rgba(0, 0, 0, 0.3),
+        0 8px 20px rgba(0, 0, 0, 0.5);
+}
+
+.pumpkin::before {
+    content: '';
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 20px;
+    background: #4a7c2e;
+    border-radius: 50% 50% 0 0;
+}
+
+.pumpkin::after {
+    content: '👻';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2em;
+}
+
+.pumpkin-left {
+    left: 50px;
+}
+
+.pumpkin-right {
+    right: 50px;
+}
+
+.cauldron {
+    display: none !important;
+}
+
+.cauldron {
+    position: absolute;
+    bottom: 20px;
+    left: 150px;
+    width: 80px;
+    height: 60px;
+    background: linear-gradient(180deg, #2d2d2d 0%, #1a1a1a 100%);
+    border-radius: 0 0 40px 40px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+}
+
+.cauldron::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 20px;
+    background: #ff8c00;
+    border-radius: 50%;
+    box-shadow: 0 0 20px rgba(255, 140, 0, 0.8);
+    animation: bubble 2s infinite;
+}
+
+@keyframes bubble {
+    0%, 100% {
+        opacity: 0.6;
+        transform: translateX(-50%) scale(1);
+    }
+    50% {
+        opacity: 1;
+        transform: translateX(-50%) scale(1.1);
+    }
+}
+
+.witch-hat {
+    display: none !important;
+}
+
+.witch-hat {
+    position: absolute;
+    bottom: 20px;
+    right: 150px;
+    width: 0;
+    height: 0;
+    border-left: 40px solid transparent;
+    border-right: 40px solid transparent;
+    border-bottom: 60px solid #1a1a1a;
+    filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.5));
+}
+
+.witch-hat::after {
+    content: '';
+    position: absolute;
+    bottom: -70px;
+    left: -60px;
+    width: 120px;
+    height: 15px;
+    background: #1a1a1a;
+    border-radius: 50%;
 }
 
 /* ========================================
-   MODAL DE PRÊMIO/REGRAS
+   MODAL DE PRÊMIO
    ======================================== */
 
 .modal {
-    display: none; /* Oculto por padrão */
-    position: fixed; /* Fica por cima de tudo */
-    z-index: 100; /* Z-index alto para garantir que esteja na frente */
+    display: none;
+    position: fixed;
+    z-index: 1000;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
-    overflow: auto; /* Habilita scroll se o conteúdo for muito grande */
-    background-color: rgba(0, 0, 0, 0.8); /* Fundo escuro semi-transparente */
+    background-color: rgba(0, 0, 0, 0.8);
     justify-content: center;
     align-items: center;
-    backdrop-filter: blur(5px); /* Efeito de desfoque */
+    animation: fadeIn 0.3s ease;
 }
 
 .modal.show {
-    display: flex; /* Mostra o modal */
+    display: flex;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
 
 .modal-content {
-    background-color: #2d1b4e; /* Fundo do modal */
-    margin: auto;
-    padding: 30px;
-    border: 3px solid #ff8c00;
+    background: linear-gradient(180deg, #2d1b4e 0%, #1a0033 100%);
+    border: 6px solid #ff8c00;
     border-radius: 20px;
-    width: 90%;
-    max-width: 500px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7);
+    padding: 40px;
     text-align: center;
-    position: relative;
-    transform: scale(0.9); /* Começa um pouco menor */
-    animation: modalAppear 0.3s forwards cubic-bezier(0.2, 0.8, 0.2, 1.2); /* Animação de entrada */
+    max-width: 90%;
+    box-shadow: 0 10px 50px rgba(0, 0, 0, 0.9);
+    animation: slideIn 0.5s ease;
 }
 
-@keyframes modalAppear {
-    to { transform: scale(1); }
-}
-
-.modal-text {
-    font-size: 1.8em;
-    color: #ffd700;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
-    margin-bottom: 20px;
-    font-weight: bold;
+@keyframes slideIn {
+    from {
+        transform: translateY(-100px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
 .prize-banner {
-    margin: 20px auto;
-    width: 100%;
-    max-width: 300px; /* Ajustar tamanho do banner */
-    height: auto;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    margin-bottom: 30px;
 }
 
 .prize-banner img {
-    width: 100%;
+    max-width: 100%;
     height: auto;
-    display: block;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
 }
 
 .modal-button {
-    background: linear-gradient(180deg, #ffcc00 0%, #ffa500 100%);
-    border: 2px solid #fff;
-    border-radius: 10px;
-    padding: 12px 25px;
-    margin-top: 20px;
-    cursor: pointer;
-    font-size: 1.2em;
-    color: #333;
+    background: linear-gradient(180deg, #ffa500 0%, #ff8c00 50%, #ff6600 100%);
+    border: 4px solid #8b4513;
+    border-radius: 30px;
+    padding: 15px 40px;
+    font-size: 1.5em;
     font-weight: bold;
+    color: #4a2408;
     text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
-    transition: all 0.2s ease;
-    outline: none;
+    cursor: pointer;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s ease;
 }
 
 .modal-button:hover {
-    background: linear-gradient(180deg, #ffa500 0%, #ffcc00 100%);
-    box-shadow: 0 7px 12px rgba(0, 0, 0, 0.6);
-    transform: translateY(-1px);
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(255, 140, 0, 0.8);
 }
 
 .modal-button:active {
-    transform: translateY(1px);
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
+    transform: scale(0.95);
+}
+
+/* ========================================
+   MODAL DE REGRAS
+   ======================================== */
+
+.rules-content {
+    max-width: 500px;
 }
 
 .rules-content h2 {
+    color: #ffa500;
     font-size: 2em;
-    color: #ffd700;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
 }
 
 .rules-content p {
+    color: #ffcc66;
     font-size: 1.1em;
-    color: #fff;
-    margin-bottom: 10px;
-    line-height: 1.5;
+    margin: 15px 0;
+    line-height: 1.6;
+    text-align: left;
 }
 
-/* Link de regras */
+/* ========================================
+   LINK DE REGRAS
+   ======================================== */
+
 .rules-link {
-    margin-top: 20px;
-    position: relative;
-    z-index: 10;
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
 }
 
 .rules-link a {
-    color: #ffcc00;
+    color: #ffa500;
     text-decoration: none;
     font-size: 0.9em;
-    transition: color 0.2s ease;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
 }
 
 .rules-link a:hover {
-    color: #fff;
+    opacity: 1;
     text-decoration: underline;
 }
 
-/* Responsividade */
-@media (max-width: 768px) {
-    .slot-frame {
-        width: 320px;
-        height: 320px;
-        background-size: 100% 100%;
-    }
-    .reels-container {
-        padding-top: 60px;
-        padding-right: 25px;
-        gap: 5px;
-    }
-    .reel-viewport {
-        width: 60px;
-        height: 60px;
-    }
-    .symbol {
-        height: 60px; /* Ajustar altura do símbolo para mobile */
-    }
-    .spin-button {
-        font-size: 1.5em;
-        padding: 10px 20px;
-    }
-    .modal-content {
-        padding: 20px;
-    }
-    .modal-text {
-        font-size: 1.5em;
-    }
-    .prize-banner {
-        max-width: 250px;
-    }
-    .modal-button {
-        font-size: 1em;
-        padding: 10px 20px;
-    }
-}
+/* ========================================
+   RESPONSIVIDADE MOBILE
+   ======================================== */
 
-@media (max-width: 480px) {
-    .slot-frame {
-        width: 280px;
-        height: 280px;
-    }
-    .reels-container {
-        padding-top: 50px;
-        padding-right: 20px;
-        gap: 3px;
-    }
-    .reel-viewport {
-        width: 50px;
-        height: 50px;
-    }
-    .symbol {
-        height: 50px; /* Ajustar altura do símbolo para mobile */
-    }
-    .title-image {
-        width: 90%;
-    }
-    .attempts-counter {
-        max-width: 250px;
-        padding: 8px 15px;
-    }
-    .attempts-counter p {
-        font-size: 1em;
-    }
-    .attempts-counter span {
-        font-size: 1.2em;
-    }
-    .spin-button {
-        font-size: 1.2em;
-        padding: 8px 15px;
-    }
-    .modal-text {
-        font-size: 1.2em;
-    }
-    .prize-banner {
-        max-width: 200px;
-    }
-    .modal-button {
-        font-size: 0.9em;
-        padding: 8px 15px;
-    }
-}
+/* Layout unificado: sem media queries que alterem tamanho entre desktop e mobile */
+
