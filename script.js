@@ -17,15 +17,34 @@ const localSymbols = [
 ];
 
 const fallbackSymbols = [
-  'https://via.placeholder.com/200/ff8c00/ffffff?text=%F0%9F%8E%83',
-  'https://via.placeholder.com/200/8b4513/ffffff?text=%F0%9F%A7%99',
-  'https://via.placeholder.com/200/2d1b4e/ffffff?text=%F0%9F%8D%AF',
-  'https://via.placeholder.com/200/1a0033/ffffff?text=%F0%9F%A6%87',
-  'https://via.placeholder.com/200/ffa500/ffffff?text=%F0%9F%92%B0'
+  'https://via.placeholder.com/200/ff8c00/ffffff?text=ABOBORA',
+  'https://via.placeholder.com/200/8b4513/ffffff?text=BRUXA',
+  'https://via.placeholder.com/200/2d1b4e/ffffff?text=5+BRINDES',
+  'https://via.placeholder.com/200/1a0033/ffffff?text=CAVEIRA',
+  'https://via.placeholder.com/200/ffa500/ffffff?text=MORCEGOS'
 ];
 
 const symbols = localSymbols.slice();
 const WIN_NAME = 'pote-5brindes'; // imagem que define vitória
+
+// Fallback final: SVG embutido para garantir que sempre haja algo visível
+const FINAL_FALLBACK = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect width="100%" height="100%" fill="%232d1b4e"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-family="Arial" font-size="18">SEM IMAGEM</text></svg>';
+
+function setSymbolImage(img, index) {
+  const candidates = [symbols[index], fallbackSymbols[index]];
+  let tryIdx = 0;
+  img.onerror = () => {
+    tryIdx++;
+    if (tryIdx < candidates.length) {
+      img.src = candidates[tryIdx];
+    } else {
+      img.onerror = null;
+      img.src = FINAL_FALLBACK;
+    }
+  };
+  // Importante: registrar onerror ANTES do primeiro src
+  img.src = candidates[0];
+}
 
 // --------- Sons ---------
 const sounds = {
@@ -97,11 +116,10 @@ function buildReel() {
       wrap.className = 'symbol';
       wrap.style.height = `${symbolH}px`;
 
-      const img = document.createElement('img');
+  const img = document.createElement('img');
       img.className = 'symbol-img';
       img.alt = `Símbolo ${i + 1}`;
-      img.src = symbols[i];
-      img.onerror = () => { img.src = fallbackSymbols[i] || fallbackSymbols[0]; };
+  setSymbolImage(img, i);
 
       wrap.appendChild(img);
       reel.appendChild(wrap);
