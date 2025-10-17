@@ -1,384 +1,393 @@
 // ========================================
-// CONFIGURAÇÃO DE IMAGENS
+// SLOT HALLOWEEN — 1 ROLO, GIRO REAL COM LOOP
+// Mantém layout/design/imagens. Reescrito para:
+// - Loop contínuo (imagens não somem)
+// - Ease-out real, parada centralizada
+// - Vitória garantida ao menos 1x a cada 5 tentativas
+// - Popups: "VOCÊ PERDEU" / "VOCÊ GANHOU 6 JOIAS GRÁTIS"
 // ========================================
 
-/*
-INSTRUÇÕES PARA CONFIGURAR OS SÍMBOLOS:
-Substitua as URLs abaixo pelas URLs das suas imagens de Halloween.
-Tamanho recomendado: 200x200px (quadrado)
-Formato: PNG com fundo transparente
-
-Símbolos sugeridos:
-1. Abóbora (pumpkin)
-2. Bruxa (witch)
-3. Caldeirão (cauldron)
-4. Morcego (bat)
-5. Pote de prêmio (prize pot)
-*/
-
-// Caminhos locais esperados (adicione seus arquivos em assets/symbols/)
+// --------- Config de símbolos (mantém suas imagens) ---------
 const localSymbols = [
-    'assets/symbols/abobora-sempremio.png',   // Símbolo 1 - Abóbora sem prêmio
-    'assets/symbols/bruxa-sempremio.png',     // Símbolo 2 - Bruxa sem prêmio
-    'assets/symbols/pote-5brindes.png',       // Símbolo 3 - Pote de 5 brindes
-    'assets/symbols/caveira-sempremio.png',   // Símbolo 4 - Caveira sem prêmio
-    'assets/symbols/morcegos-sempremio.png'   // Símbolo 5 - Morcegos sem prêmio
+  'assets/symbols/abobora-sempremio.png',
+  'assets/symbols/bruxa-sempremio.png',
+  'assets/symbols/pote-5brindes.png',
+  'assets/symbols/caveira-sempremio.png',
+  'assets/symbols/morcegos-sempremio.png'
 ];
 
-// Placeholders usados como fallback caso a imagem local não exista
 const fallbackSymbols = [
-    'https://via.placeholder.com/200/ff8c00/ffffff?text=🎃',  // Abóbora
-    'https://via.placeholder.com/200/8b4513/ffffff?text=🧙',  // Bruxa
-    'https://via.placeholder.com/200/2d1b4e/ffffff?text=🍯',  // Caldeirão
-    'https://via.placeholder.com/200/1a0033/ffffff?text=🦇',  // Morcego
-    'https://via.placeholder.com/200/ffa500/ffffff?text=💰'   // Pote de prêmio
+  'https://via.placeholder.com/200/ff8c00/ffffff?text=%F0%9F%8E%83',
+  'https://via.placeholder.com/200/8b4513/ffffff?text=%F0%9F%A7%99',
+  'https://via.placeholder.com/200/2d1b4e/ffffff?text=%F0%9F%8D%AF',
+  'https://via.placeholder.com/200/1a0033/ffffff?text=%F0%9F%A6%87',
+  'https://via.placeholder.com/200/ffa500/ffffff?text=%F0%9F%92%B0'
 ];
 
-// Array efetivo de símbolos que o jogo usa
-const symbols = localSymbols;
+const symbols = localSymbols.slice();
+const WIN_NAME = 'pote-5brindes'; // imagem que define vitória
 
-/*
- * Para garantir que pelo menos uma das 5 tentativas resulte em vitória,
- * escolhemos uma rodada específica de forma aleatória durante a
- * inicialização. Nessa tentativa, o símbolo sorteado será sempre o
- * recipiente premiado definido por WIN_NAME. Se você preferir que a
- * vitória ocorra em uma rodada fixa (por exemplo, sempre na 4ª),
- * defina o valor de predeterminedWinAttempt manualmente.
- */
-let predeterminedWinAttempt = Math.floor(Math.random() * 5) + 1; // 1 a 5
-// Guardamos o índice que corresponde ao símbolo vencedor para uso posterior
-function getWinIndex() {
-    const idx = symbols.findIndex(src => typeof src === 'string' && src.includes(WIN_NAME));
-    return idx >= 0 ? idx : 0;
-}
-
-function pickTargetIndex(attemptNumber) {
-    // Se estivermos na rodada premiada, retornamos sempre o índice do símbolo vencedor
-    if (attemptNumber === predeterminedWinAttempt) return getWinIndex();
-    // Caso contrário, sorteamos uniformemente entre todos os símbolos
-    return Math.floor(Math.random() * symbols.length);
-}
-
-/*
-INSTRUÇÕES PARA CONFIGURAR O BANNER DE PRÊMIO:
-Edite o arquivo index.html e substitua a URL na tag img com id="prizeBannerImg"
-Tamanho recomendado: 600x300px (proporção 2:1)
-Formato: PNG com fundo transparente ou JPG
-*/
-
-// ========================================
-// CONFIGURAÇÃO DE SONS
-// ========================================
-
-// URLs dos sons (você pode substituir por seus próprios arquivos de áudio)
+// --------- Sons ---------
 const sounds = {
-    spin: new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3'), // Som de girar
-    win: new Audio('https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3'),  // Som de vitória
-    lose: new Audio('https://assets.mixkit.co/active_storage/sfx/2572/2572-preview.mp3')  // Som de derrota
+  spin: new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3'),
+  win:  new Audio('https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3'),
+  lose: new Audio('https://assets.mixkit.co/active_storage/sfx/2572/2572-preview.mp3')
 };
+Object.values(sounds).forEach(s => s.volume = 0.35);
 
-// Configurar volume dos sons
-Object.values(sounds).forEach(sound => {
-    sound.volume = 0.3;
-});
-
-// ========================================
-// BANNERS DE PRÊMIO
-// ========================================
-
-/**
- * Gera uma imagem base64 usando canvas com fundo personalizado e texto
- * centralizado. Essa abordagem evita depender de recursos externos e
- * permite que as mensagens de vitória/derrota sigam o tema visual do jogo.
- *
- * @param {string} text Texto que será exibido. Quebras de linha podem ser
- *                      inseridas com "\n" para dividir em linhas.
- * @returns {string} URL de dados (data:image/png;base64,...) para uso em img.src
- */
-function createBanner(text) {
-    const canvas = document.createElement('canvas');
-    const width = 600;
-    const height = 300;
-    canvas.width = width;
-    canvas.height = height;
-    const ctx = canvas.getContext('2d');
-    // Fundo em gradiente vertical seguindo as cores base do jogo
-    const grad = ctx.createLinearGradient(0, 0, 0, height);
-    grad.addColorStop(0, '#2d1b4e');
-    grad.addColorStop(1, '#1a0033');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, width, height);
-    // Moldura
-    ctx.strokeStyle = '#ff8c00';
-    ctx.lineWidth = 8;
-    ctx.strokeRect(10, 10, width - 20, height - 20);
-    // Texto
-    ctx.fillStyle = '#ffa500';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    // Ajuste de fonte: tamanho diminui em dispositivos menores
-    let fontSize = 36;
-    ctx.font = `bold ${fontSize}px Arial`;
-    const lines = text.split('\n');
-    const lineHeight = 44;
-    const startY = height / 2 - ((lines.length - 1) * lineHeight) / 2;
-    lines.forEach((line, idx) => {
-        ctx.fillText(line, width / 2, startY + idx * lineHeight);
-    });
-    return canvas.toDataURL('image/png');
-}
-
-// Pré-cria os banners de vitória e derrota
-const bannerWin = createBanner('VOCÊ GANHOU\n6 JOIAS GRÁTIS');
-const bannerLose = createBanner('VOCÊ PERDEU');
-
-// ========================================
-// VARIÁVEIS GLOBAIS
-// ========================================
-
+// --------- Estado do jogo ---------
 let attemptsLeft = 5;
 let currentAttempt = 0;
 let isSpinning = false;
-// Vitória quando a imagem selecionada for o pote de 5 brindes
-const WIN_NAME = 'pote-5brindes';
 
-// As funções getWinIndex e pickTargetIndex são definidas acima, junto com a
-// seleção da rodada vencedora (predeterminedWinAttempt).
-// ========================================
-// ELEMENTOS DOM
-// ========================================
+// Para garantir vitória 1x a cada 5 tentativas
+let predeterminedWinAttempt = randInt(1, 5);
 
-const spinButton = document.getElementById('spinButton');
-const attemptsDisplay = document.getElementById('attempts');
-const encouragement = document.getElementById('encouragement');
-const prizeModal = document.getElementById('prizeModal');
-const rulesModal = document.getElementById('rulesModal');
-const nextRoundButton = document.getElementById('nextRoundButton');
-const rulesLink = document.getElementById('rulesLink');
+// --------- DOM ---------
+const spinButton       = document.getElementById('spinButton');
+const attemptsDisplay  = document.getElementById('attempts');
+const encouragement    = document.getElementById('encouragement');
+
+const prizeModal       = document.getElementById('prizeModal');
+const rulesModal       = document.getElementById('rulesModal');
+const nextRoundButton  = document.getElementById('nextRoundButton');
+const rulesLink        = document.getElementById('rulesLink');
 const closeRulesButton = document.getElementById('closeRulesButton');
-const prizeBannerImg = document.getElementById('prizeBannerImg');
-const reels = [
-    document.getElementById('reel1')
-];
+const prizeBannerImg   = document.getElementById('prizeBannerImg');
 
-// ========================================
-// INICIALIZAÇÃO
-// ========================================
+// ÚNICO REEL (viewport -> reel)
+const reelViewport = document.querySelector('.reel-viewport');
+const reel         = document.getElementById('reel1');
 
-// Carregar símbolos nas bobinas
-function loadSymbols() {
-    reels.forEach(reel => {
-        const symbolElements = reel.querySelectorAll('.symbol-img');
-        symbolElements.forEach((img, index) => {
-            img.onerror = () => { img.src = fallbackSymbols[index]; };
-            img.src = symbols[index];
-        });
-    });
-}
+// --------- Motor da bobina ---------
+// Repetimos os símbolos para fazer loop contínuo
+const LOOPS = 12; // quantas vezes repetir a sequência (grande o suficiente p/ 2s de giro rápido)
+let repeated = [];        // vetor de índices base (0..4) repetidos
+let itemEls = [];         // elementos DOM correspondentes
+let symbolH = 0;          // altura (px) de um símbolo (igual à altura do viewport)
+let totalH = 0;           // altura total da trilha
+let offset = 0;           // deslocamento atual em px (0 = topo da trilha)
+let rafId = null;
 
-// Inicializar o jogo
+// --------- Inicialização ---------
 function init() {
-    loadSymbols();
-    updateAttemptsDisplay();
-    updateEncouragement();
+  buildReel();
+  updateAttemptsDisplay();
+  updateEncouragement();
+}
+document.addEventListener('DOMContentLoaded', init);
+
+// Monta a trilha do rolo em loop contínuo
+function buildReel() {
+  reel.innerHTML = '';
+  itemEls = [];
+  repeated = [];
+
+  // Altura 1:1 da janela já é definida via CSS; aqui medimos para usar em px
+  symbolH = Math.round(reelViewport.clientHeight);
+  if (symbolH === 0) {
+    // fallback se ainda não renderizou
+    symbolH = 260;
+  }
+
+  // Cria LOOPS vezes a sequência (0..4)
+  for (let l = 0; l < LOOPS; l++) {
+    for (let i = 0; i < symbols.length; i++) {
+      const wrap = document.createElement('div');
+      wrap.className = 'symbol';
+      wrap.style.height = `${symbolH}px`;
+
+      const img = document.createElement('img');
+      img.className = 'symbol-img';
+      img.alt = `Símbolo ${i + 1}`;
+      img.src = symbols[i];
+      img.onerror = () => { img.src = fallbackSymbols[i] || fallbackSymbols[0]; };
+
+      wrap.appendChild(img);
+      reel.appendChild(wrap);
+
+      repeated.push(i);
+      itemEls.push(wrap);
+    }
+  }
+
+  totalH = repeated.length * symbolH;
+  offset = 0;
+  applyTransform();
 }
 
-// ========================================
-// FUNÇÕES DE ATUALIZAÇÃO DE UI
-// ========================================
+// --------- Girar ---------
+spinButton.addEventListener('click', spin);
 
+async function spin() {
+  if (isSpinning || attemptsLeft <= 0) return;
+
+  isSpinning = true;
+  spinButton.disabled = true;
+
+  currentAttempt++;
+  attemptsLeft--;
+  updateAttemptsDisplay();
+  updateEncouragement();
+
+  // Qual símbolo alvo?
+  const wantWin = (currentAttempt === predeterminedWinAttempt);
+  const winIdx  = getWinIndex(); // índice do símbolo com WIN_NAME na base (0..4)
+  const targetBaseIndex = wantWin ? winIdx : getRandomNonWinIndex(winIdx);
+
+  // Som de giro (contínuo durante a animação)
+  try { sounds.spin.currentTime = 0; sounds.spin.play(); } catch (_) {}
+
+  // Duração ~2s, adrenalina: começa MUITO rápido e desacelera
+  const duration = 2000; // ms
+  const start    = performance.now();
+  const startOffset = offset;
+
+  // Precisamos garantir diversas “passagens” antes de parar no alvo.
+  // Vamos calcular um destino em pixels que:
+  //  - Dá várias voltas (múltiplos de symbolH)
+  //  - E finaliza com o alvo no centro do viewport
+  const minTurns = 18; // pelo menos 18 símbolos percorridos (adrenalina)
+  const endOffset = computeEndOffset(startOffset, targetBaseIndex, minTurns);
+
+  // Animação easeOutCubic
+  await new Promise(resolve => {
+    const easeOutCubic = t => 1 - Math.pow(1 - t, 3);
+
+    const step = (now) => {
+      const t = Math.min(1, (now - start) / duration);
+      const eased = easeOutCubic(t);
+
+      offset = lerp(startOffsetNorm(startOffset), endOffset, eased);
+      normalizeOffset();
+      applyTransform();
+
+      if (t < 1) {
+        rafId = requestAnimationFrame(step);
+      } else {
+        resolve();
+      }
+    };
+    rafId = requestAnimationFrame(step);
+  });
+
+  // Termina som de giro
+  try { sounds.spin.pause(); } catch (_) {}
+
+  // Verifica vitória
+  const isWin = (targetBaseIndex === winIdx);
+
+  // Mostra modal correto
+  showPrizeModal(isWin);
+
+  isSpinning = false;
+  if (attemptsLeft > 0) {
+    spinButton.disabled = false;
+  } else {
+    spinButton.textContent = 'FIM DE JOGO';
+  }
+}
+
+// Calcula o índice que corresponde ao símbolo vencedor na base (0..4)
+function getWinIndex() {
+  const idx = symbols.findIndex(src => typeof src === 'string' && src.includes(WIN_NAME));
+  return idx >= 0 ? idx : 0;
+}
+
+// Retorna um índice base aleatório que NÃO seja o vencedor
+function getRandomNonWinIndex(winIdx) {
+  let idx;
+  do {
+    idx = randInt(0, symbols.length - 1);
+  } while (idx === winIdx);
+  return idx;
+}
+
+// Dado o offset atual (px) e o índice alvo na base (0..4), calcula um destino que
+// faz várias voltas e para com o alvo centralizado.
+function computeEndOffset(startOffset, targetBaseIndex, minTurns = 12) {
+  // Descobrir qual símbolo está no centro agora
+  const currentCenterIndex = getCenterBaseIndex(startOffset);
+
+  // Quantos “passos” (símbolos) até chegar ao target a partir do atual
+  let stepsToTarget = (targetBaseIndex - currentCenterIndex);
+  while (stepsToTarget < 0) stepsToTarget += symbols.length;
+
+  // Adiciona voltas para dar adrenalina
+  const totalSteps = stepsToTarget + minTurns;
+
+  // Cada passo = +symbolH px (vamos mover “para cima”, ou seja, aumentar offset)
+  const targetOffset = startOffset + totalSteps * symbolH;
+
+  // Alinhamento perfeito do alvo no centro:
+  // O centro corresponde a um faixa de offset tal que remainder(symbolH) ~ 0
+  // Como o startOffset pode não estar em borda exata, o cálculo acima já garante
+  // que após ‘totalSteps’ inteiros estaremos exatamente no centro do alvo.
+  return targetOffset;
+}
+
+// Retorna qual índice base (0..4) está visível no centro para um dado offset (px)
+function getCenterBaseIndex(offPx) {
+  // Qual item “inteiro” está centralizado?
+  const centerRow = Math.round(offPx / symbolH) % repeated.length;
+  const idx = (centerRow + repeated.length) % repeated.length;
+  return repeated[idx] % symbols.length;
+}
+
+// Aplica o transform conforme o offset atual
+function applyTransform() {
+  reel.style.transform = `translateY(${-offset}px)`;
+}
+
+// Mantém o offset dentro do intervalo [0, totalH)
+function normalizeOffset() {
+  if (totalH === 0) return;
+  offset = ((offset % totalH) + totalH) % totalH;
+}
+
+// Pequenas ajudas
+function lerp(a, b, t) { return a + (b - a) * t; }
+function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+
+// Corrige o início caso o startOffset não estivesse normalizado
+function startOffsetNorm(x) {
+  if (totalH === 0) return x;
+  return ((x % totalH) + totalH) % totalH;
+}
+
+// --------- UI auxiliares ---------
 function updateAttemptsDisplay() {
-    attemptsDisplay.textContent = attemptsLeft;
+  attemptsDisplay.textContent = attemptsLeft;
 }
 
 function updateEncouragement() {
-    const messages = [
-        'Gire e ganhe!',
-        'Boa sorte!',
-        'Você consegue!',
-        'Tente novamente!',
-        'Última chance!'
-    ];
-    
-    if (attemptsLeft === 0) {
-        encouragement.textContent = 'Fim de jogo!';
-    } else if (attemptsLeft === 1) {
-        encouragement.textContent = messages[4];
-    } else if (currentAttempt === 3) {
-        encouragement.textContent = 'Próxima rodada é especial! 🎁';
-    } else {
-        encouragement.textContent = messages[Math.min(currentAttempt, messages.length - 1)];
-    }
+  const messages = [
+    'Gire e ganhe!',
+    'Boa sorte!',
+    'Você consegue!',
+    'Tente novamente!',
+    'Última chance!'
+  ];
+
+  if (attemptsLeft === 0) {
+    encouragement.textContent = 'Fim de jogo!';
+  } else if (attemptsLeft === 1) {
+    encouragement.textContent = messages[4];
+  } else {
+    encouragement.textContent = messages[Math.min(currentAttempt, messages.length - 1)];
+  }
 }
 
-// ========================================
-// FUNÇÃO PRINCIPAL DE GIRAR
-// ========================================
-
-async function spin() {
-    if (isSpinning || attemptsLeft === 0) return;
-    
-    isSpinning = true;
-    spinButton.disabled = true;
-    currentAttempt++;
-    attemptsLeft--;
-    
-    // Tocar som de girar
-    try {
-        sounds.spin.currentTime = 0;
-        sounds.spin.play().catch(e => console.log('Erro ao tocar som:', e));
-    } catch (e) {
-        console.log('Erro ao tocar som:', e);
-    }
-    
-    // Adicionar classe de animação
-    // Preparar rotação: animar a tira do reel (compatível desktop/mobile)
-    reels.forEach(reel => {
-        reel.style.transition = 'none';
-        reel.style.transform = 'translateY(0)';
-        void reel.offsetHeight; // reflow
-        reel.classList.add('spinning');
-        const img = reel.querySelector('.symbol-img');
-        if (img) img.classList.add('spinning');
-    });
-    
-    // Simular tempo de giro
-    await sleep(2000);
-    
-    // Parar as bobinas uma por uma
-    let isWin = false;
-    for (let i = 0; i < reels.length; i++) {
-        await sleep(300);
-        const reel = reels[i];
-        reel.classList.remove('spinning');
-        const img = reel.querySelector('.symbol-img');
-        if (img) img.classList.remove('spinning');
-        // Determinar o símbolo final usando a lógica de rodada premiada
-        const targetIndex = pickTargetIndex(currentAttempt);
-        // Parar suavemente no símbolo escolhido (cada símbolo = 20% da altura do reel)
-        const stopPct = -targetIndex * 20; // -20%, -40%, ...
-        reel.style.transition = 'transform 300ms ease-out';
-        reel.style.transform = `translateY(${stopPct}%)`;
-        if (targetIndex === getWinIndex()) {
-            isWin = true;
-        }
-    }
-    
-    // Aguardar um pouco antes de mostrar o resultado
-    await sleep(500);
-    
-    // Mostrar resultado baseado no símbolo sorteado (1 vencedor, 4 perdas)
-    showPrizeModal(isWin);
-    
-    // Atualizar displays
-    updateAttemptsDisplay();
-    updateEncouragement();
-    
-    isSpinning = false;
-    
-    // Reabilitar botão se ainda houver tentativas
-    if (attemptsLeft > 0) {
-        spinButton.disabled = false;
-    } else {
-        spinButton.textContent = 'FIM DE JOGO';
-    }
-}
-
-// ========================================
-// FUNÇÕES DE MODAL
-// ========================================
-
+// --------- Modais ---------
 function showPrizeModal(isWin) {
-    // Tocar som apropriado
-    try {
-        if (isWin) {
-            sounds.win.currentTime = 0;
-            sounds.win.play().catch(e => console.log('Erro ao tocar som:', e));
-        } else {
-            sounds.lose.currentTime = 0;
-            sounds.lose.play().catch(e => console.log('Erro ao tocar som:', e));
-        }
-    } catch (e) {
-        console.log('Erro ao tocar som:', e);
-    }
-    
-    // Configurar banner e texto do botão de acordo com vitória/derrota
-    if (isWin) {
-        prizeBannerImg.src = bannerWin;
-        prizeBannerImg.alt = 'VOCÊ GANHOU 6 JOIAS GRÁTIS';
-        // Se ainda houver tentativas, o usuário pode visualizar o prêmio e continuar
-        nextRoundButton.textContent = attemptsLeft > 0 ? 'VER MEU PRÊMIO' : 'Fechar';
-    } else {
-        prizeBannerImg.src = bannerLose;
-        prizeBannerImg.alt = 'VOCÊ PERDEU';
-        nextRoundButton.textContent = attemptsLeft > 0 ? 'TENTAR NOVAMENTE' : 'Fechar';
-    }
-    
-    // Mostrar modal
-    prizeModal.classList.add('show');
+  try {
+    if (isWin) { sounds.win.currentTime = 0; sounds.win.play(); }
+    else       { sounds.lose.currentTime = 0; sounds.lose.play(); }
+  } catch (_) {}
+
+  // Gera banner dinâmico com texto certo (mantendo seu layout/modal)
+  const text = isWin ? 'VOCÊ GANHOU 6 JOIAS GRÁTIS' : 'VOCÊ PERDEU';
+  const bg   = isWin ? '#ffa500' : '#8b4513';
+  prizeBannerImg.src = makeBannerDataURL(text, bg);
+  prizeBannerImg.alt = text;
+
+  // Mostra modal
+  prizeModal.classList.add('show');
+
+  // Texto do botão conforme pedido
+  nextRoundButton.textContent = isWin ? 'VER MEU PRÊMIO' : 'TENTAR NOVAMENTE';
 }
 
 function closePrizeModal() {
-    prizeModal.classList.remove('show');
+  prizeModal.classList.remove('show');
 }
 
-function showRulesModal() {
-    rulesModal.classList.add('show');
-}
+function showRulesModal()  { rulesModal.classList.add('show'); }
+function closeRulesModal() { rulesModal.classList.remove('show'); }
 
-function closeRulesModal() {
-    rulesModal.classList.remove('show');
-}
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
-// ========================================
-// FUNÇÕES AUXILIARES
-// ========================================
-
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-// ========================================
-// EVENT LISTENERS
-// ========================================
-
-spinButton.addEventListener('click', spin);
-
+// --------- Eventos dos botões ---------
 nextRoundButton.addEventListener('click', () => {
-    closePrizeModal();
-    if (attemptsLeft === 0) {
-        // Reiniciar jogo
-        attemptsLeft = 5;
-        currentAttempt = 0;
-        spinButton.disabled = false;
-        spinButton.textContent = 'GIRAR';
-        // Sortear nova rodada vencedora
-        predeterminedWinAttempt = Math.floor(Math.random() * 5) + 1;
-        updateAttemptsDisplay();
-        updateEncouragement();
-    }
+  closePrizeModal();
+  if (attemptsLeft === 0) {
+    // Reiniciar rodada completa
+    attemptsLeft = 5;
+    currentAttempt = 0;
+    predeterminedWinAttempt = randInt(1, 5);
+    spinButton.disabled = false;
+    spinButton.textContent = 'GIRAR';
+    updateAttemptsDisplay();
+    updateEncouragement();
+  }
 });
 
 rulesLink.addEventListener('click', (e) => {
-    e.preventDefault();
-    showRulesModal();
+  e.preventDefault();
+  showRulesModal();
 });
-
 closeRulesButton.addEventListener('click', closeRulesModal);
 
-// Fechar modais ao clicar fora
+// Fecha modais ao clicar fora
 window.addEventListener('click', (e) => {
-    if (e.target === prizeModal) {
-        closePrizeModal();
-    }
-    if (e.target === rulesModal) {
-        closeRulesModal();
-    }
+  if (e.target === prizeModal) closePrizeModal();
+  if (e.target === rulesModal) closeRulesModal();
 });
 
-// ========================================
-// INICIAR JOGO
-// ========================================
+// --------- Banner: gera uma imagem com o texto solicitado ---------
+function makeBannerDataURL(text, bg) {
+  const w = 800, h = 360;
+  const c = document.createElement('canvas');
+  c.width = w; c.height = h;
+  const ctx = c.getContext('2d');
 
-init();
+  // Fundo
+  const grad = ctx.createLinearGradient(0, 0, 0, h);
+  grad.addColorStop(0, bg);
+  grad.addColorStop(1, shadeColor(bg, -30));
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, w, h);
 
+  // Moldura
+  ctx.strokeStyle = '#8b4513';
+  ctx.lineWidth = 16;
+  ctx.strokeRect(10, 10, w - 20, h - 20);
+
+  // Texto
+  ctx.fillStyle = '#2d1b4e';
+  ctx.font = 'bold 44px Arial';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  // Quebra em 2 linhas se necessário
+  const parts = splitText(text, 24);
+  const baseY = h / 2 - ((parts.length - 1) * 46) / 2;
+  parts.forEach((line, i) => {
+    ctx.fillText(line, w / 2, baseY + i * 46);
+  });
+
+  return c.toDataURL('image/png');
+}
+
+function splitText(t, max) {
+  const words = t.split(' ');
+  const lines = [];
+  let cur = '';
+  for (const w of words) {
+    const tryLine = cur ? cur + ' ' + w : w;
+    if (tryLine.length <= max) cur = tryLine;
+    else { if (cur) lines.push(cur); cur = w; }
+  }
+  if (cur) lines.push(cur);
+  return lines;
+}
+
+function shadeColor(col, amt) {
+  // col #rrggbb ; amt -100..+100
+  const f = parseInt(col.slice(1),16);
+  let r = (f>>16) + amt, g = (f>>8 & 0x00FF) + amt, b = (f & 0x0000FF) + amt;
+  r = Math.max(Math.min(255,r),0);
+  g = Math.max(Math.min(255,g),0);
+  b = Math.max(Math.min(255,b),0);
+  return `#${(r<<16 | g<<8 | b).toString(16).padStart(6,'0')}`;
+}
