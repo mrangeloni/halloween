@@ -113,10 +113,8 @@ let attemptsLeft = 5;
 let currentAttempt = 0;
 let isSpinning = false;
 
-// Para garantir vitória 1x a cada 5 tentativas
-// Garante pelo menos 1 vitória a cada 5 tentativas (posição aleatória dentro do bloco)
-let predeterminedWinAttempt = randInt(1, 5);
-let cycleStartAttempt = 1; // início do ciclo atual (1..)
+// Vitória fixa na 3ª tentativa de cada rodada
+// (currentAttempt é reiniciado a cada nova rodada)
 
 // --------- DOM ---------
 const spinButton       = document.getElementById('spinButton');
@@ -314,14 +312,8 @@ async function spin() {
 
   // Delay de 0,5s após o clique antes de iniciar o giro
   await sleep(800);
-  // Qual símbolo alvo?
-  // Dentro de cada bloco de 5 tentativas, define 1 vitória obrigatória
-  if ((currentAttempt - cycleStartAttempt) >= 5) {
-    // iniciou novo bloco
-    cycleStartAttempt = currentAttempt;
-    predeterminedWinAttempt = currentAttempt + randInt(1, 5) - 1; // dentro do novo bloco
-  }
-  const wantWin = (currentAttempt === predeterminedWinAttempt);
+  // Qual símbolo alvo? — 3ª tentativa sempre vence
+  const wantWin = (currentAttempt === 3);
   const winIdx  = getWinIndex(); // índice do símbolo com WIN_NAME na base (0..4)
   const targetBaseIndex = wantWin ? winIdx : getRandomNonWinIndex(winIdx);
 
@@ -502,8 +494,6 @@ nextRoundButton.addEventListener('click', () => {
     // Reiniciar rodada completa
     attemptsLeft = 5;
     currentAttempt = 0;
-    cycleStartAttempt = 1;
-    predeterminedWinAttempt = randInt(1, 5);
     spinButton.disabled = false;
     spinButton.textContent = 'GIRAR';
     updateAttemptsDisplay();
