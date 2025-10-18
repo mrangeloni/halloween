@@ -195,7 +195,7 @@ body {
     background: none;
     border: none;
     border-radius: 0;
-    padding: 8px 0 4px; /* menos espaço acima */
+    padding: 0px 0 4px; /* menos espaço acima */
     box-shadow: none;
     position: relative;
     margin-bottom: 6px;
