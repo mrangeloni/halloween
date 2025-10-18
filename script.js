@@ -321,11 +321,17 @@ async function spin() {
 
   // Delay de 0,5s após o clique antes de iniciar o giro
   await sleep(500);
+  // Alinha o offset para a borda de linha mais próxima para padronizar o início visual
+  if (symbolH > 0) {
+    offset = Math.round(offset / symbolH) * symbolH;
+    normalizeOffset();
+    drawCanvas();
+  }
   // Qual símbolo alvo? — 3ª tentativa sempre vence
   const wantWin = (currentAttempt === 3);
   allowWinSymbolRender = wantWin;
   const winIdx  = getWinIndex(); // índice do símbolo com WIN_NAME na base (0..4)
-  const targetBaseIndex = wantWin ? winIdx : getRandomNonWinIndex(winIdx);
+  const targetBaseIndex = wantWin ? winIdx : getFixedNonWinIndex(winIdx);
 
   // Som de giro (contínuo durante a animação)
   try {
@@ -343,7 +349,7 @@ async function spin() {
   // Vamos calcular um destino em pixels que:
   //  - Dá várias voltas (múltiplos de symbolH)
   //  - E finaliza com o alvo no centro do viewport
-  const minTurns = 18; // pelo menos 18 símbolos percorridos (adrenalina)
+  const minTurns = 20; // passo fixo para padronizar o giro
   const endOffset = computeEndOffset(startOffset, targetBaseIndex, minTurns);
 
   // Animação easeOutCubic
@@ -414,6 +420,12 @@ function getRandomNonWinIndex(winIdx) {
     idx = randInt(0, symbols.length - 1);
   } while (idx === winIdx);
   return idx;
+}
+
+// Índice de derrota fixo para tornar o giro repetível nas tentativas 1 e 2
+function getFixedNonWinIndex(winIdx) {
+  // Escolhe, por exemplo, o símbolo imediatamente após o vencedor (cíclico)
+  return (winIdx + 1) % symbols.length;
 }
 
 // Dado o offset atual (px) e o índice alvo na base (0..4), calcula um destino que
