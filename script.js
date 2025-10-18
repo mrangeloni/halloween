@@ -28,7 +28,7 @@ const symbols = localSymbols.slice();
 const WIN_NAME = 'pote-5brindes'; // imagem que define vitória
 // Deslocamento visual dos símbolos dentro da janela (sem mexer na moldura)
 const IMAGE_OFFSET_X = 8; // esquerda 5px
-const IMAGE_OFFSET_Y =  50; // baixo 5px
+const IMAGE_OFFSET_Y =  10; // baixo 5px
 
 // Fallback final: SVG embutido para garantir que sempre haja algo visível
 const FINAL_FALLBACK = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect width="100%" height="100%" fill="%232d1b4e"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-family="Arial" font-size="18">SEM IMAGEM</text></svg>';
