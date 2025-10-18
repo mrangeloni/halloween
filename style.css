@@ -183,8 +183,8 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    gap: 8px;
+    justify-content: flex-start;
+    gap: 4px; /* aproxima os elementos verticalmente */
 }
 
 /* ========================================
@@ -454,7 +454,7 @@ body {
     color: #4a2408;
     text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.5);
     cursor: pointer;
-    margin: 8px auto 4px; /* sobe o botão, menos espaço acima/abaixo */
+    margin: 2px auto 28px; /* bem próximo do slot (topo) e distante das regras (base) */
     display: block;
     box-shadow: 
         0 8px 20px rgba(0, 0, 0, 0.5),
