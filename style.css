@@ -199,7 +199,7 @@ body {
     box-shadow: none;
     position: relative;
     margin-bottom: 6px;
-    margin-top: 5px; !important;
+    margin-top: 5px !important;
 }
 
 .title {
@@ -271,7 +271,7 @@ body {
     background-image: url('assets/slot-frame.png');
     background-size: 90% 90%;
     background-repeat: no-repeat;
-    background-position: center;
+    background-position: center calc(50% - 5px); /* sobe a moldura 5px */
     position: relative;
     width: 416px;
     height: 416px;
