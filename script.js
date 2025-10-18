@@ -63,7 +63,9 @@ let currentAttempt = 0;
 let isSpinning = false;
 
 // Para garantir vitória 1x a cada 5 tentativas
-let predeterminedWinAttempt = 3; // 3ª tentativa garante vitória
+// Garante pelo menos 1 vitória a cada 5 tentativas (posição aleatória dentro do bloco)
+let predeterminedWinAttempt = randInt(1, 5);
+let cycleStartAttempt = 1; // início do ciclo atual (1..)
 
 // --------- DOM ---------
 const spinButton       = document.getElementById('spinButton');
@@ -77,6 +79,19 @@ const closeRulesButton = document.getElementById('closeRulesButton');
 const prizeBannerImg   = document.getElementById('prizeBannerImg');
 const PRIZE_URL        = 'https://lp.vidajoias.com/halloween/';
 let lastIsWin = false;
+let backBlockerEnabled = false;
+
+function disableBackNavigation() {
+  if (backBlockerEnabled) return;
+  backBlockerEnabled = true;
+  try {
+    history.pushState(null, '', location.href);
+    const trap = () => history.pushState(null, '', location.href);
+    window.addEventListener('popstate', trap);
+  } catch (_) {
+    // Em caso de ambientes que bloqueiam History API, silencie.
+  }
+}
 
 // ÚNICO REEL (canvas renderer)
 const reelViewport = document.querySelector('.reel-viewport');
@@ -240,6 +255,12 @@ async function spin() {
   // incentivo removido
 
   // Qual símbolo alvo?
+  // Dentro de cada bloco de 5 tentativas, define 1 vitória obrigatória
+  if ((currentAttempt - cycleStartAttempt) >= 5) {
+    // iniciou novo bloco
+    cycleStartAttempt = currentAttempt;
+    predeterminedWinAttempt = currentAttempt + randInt(1, 5) - 1; // dentro do novo bloco
+  }
   const wantWin = (currentAttempt === predeterminedWinAttempt);
   const winIdx  = getWinIndex(); // índice do símbolo com WIN_NAME na base (0..4)
   const targetBaseIndex = wantWin ? winIdx : getRandomNonWinIndex(winIdx);
@@ -377,6 +398,11 @@ function showPrizeModal(isWin, landedIndex) {
     else       { sounds.lose.currentTime = 0; sounds.lose.play(); }
   } catch (_) {}
 
+  if (isWin) {
+    // Bloqueia voltar à página anterior até recarregar
+    disableBackNavigation();
+  }
+
   // Imagem coerente com o símbolo que parou no centro
   const imgSrc = getPrizeImageSrc(landedIndex);
   const altTxt = getSymbolName(landedIndex, isWin);
@@ -403,7 +429,7 @@ function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 nextRoundButton.addEventListener('click', () => {
   if (lastIsWin) {
     // Redireciona para a página do prêmio
-    window.location.href = PRIZE_URL;
+    window.location.replace(PRIZE_URL);
     return;
   }
   // Caso de derrota: fecha modal e segue fluxo normal
@@ -412,7 +438,8 @@ nextRoundButton.addEventListener('click', () => {
     // Reiniciar rodada completa
     attemptsLeft = 5;
     currentAttempt = 0;
-    predeterminedWinAttempt = 3; // mantém regra da 3ª tentativa
+    cycleStartAttempt = 1;
+    predeterminedWinAttempt = randInt(1, 5);
     spinButton.disabled = false;
     spinButton.textContent = 'GIRAR';
     updateAttemptsDisplay();
