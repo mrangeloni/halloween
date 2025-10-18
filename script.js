@@ -49,19 +49,28 @@ function setSymbolImage(img, index) {
   img.src = candidates[0];
 }
 
-// --------- Sons ---------
-const sounds = {
-  click: new Audio('https://assets.mixkit.co/active_storage/sfx/1165/1165-preview.mp3'), // clique curto
-  spin:  new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3'), // rotação
-  win:   new Audio('https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3'), // vitória
-  lose:  new Audio('https://assets.mixkit.co/active_storage/sfx/2572/2572-preview.mp3')  // derrota
+// --------- Sons (arquivos locais em assets/sounds) ---------
+const SOUND_PATHS = {
+  click: 'assets/sounds/click.mp3',
+  spin:  'assets/sounds/spin.mp3',
+  win:   'assets/sounds/win.mp3',
+  lose:  'assets/sounds/lose.mp3',
+  bg:    'assets/sounds/halloween.mp3'
 };
-Object.values(sounds).forEach(s => s.volume = 0.35);
+
+const sounds = {
+  click: new Audio(SOUND_PATHS.click), // clique curto
+  spin:  new Audio(SOUND_PATHS.spin),  // rotação
+  win:   new Audio(SOUND_PATHS.win),   // vitória
+  lose:  new Audio(SOUND_PATHS.lose)   // derrota
+};
+Object.values(sounds).forEach(s => { s.volume = 0.35; s.preload = 'auto'; });
 
 // Música de fundo (loop) — tentaremos tocar no load e, se bloqueado, na 1ª interação
-const backgroundMusic = new Audio('https://assets.mixkit.co/active_storage/music/1091/1091-preview.mp3');
+const backgroundMusic = new Audio(SOUND_PATHS.bg);
 backgroundMusic.loop = true;
 backgroundMusic.volume = 0.18;
+backgroundMusic.preload = 'auto';
 let bgStarted = false;
 
 function ensureBackgroundMusic() {
