@@ -369,11 +369,22 @@ async function spin() {
 
   // Termina som de giro
   try { if (spinInstance) { stopSfx(spinInstance); spinInstance = null; } } catch (_) {}
+  // Se prometemos vitória e por arredondamento não caiu no alvo, força encaixe no pote
+  if (wantWin) {
+    const winIdx = getWinIndex();
+    const centerRow = Math.round(offset / symbolH);
+    const bestRow = findClosestRowForBaseIndex(winIdx, centerRow);
+    if (bestRow != null) {
+      offset = bestRow * symbolH;
+      normalizeOffset();
+      drawCanvas();
+    }
+  }
   allowWinSymbolRender = false;
 
   // Verifica símbolo central ao terminar e vitória
   const landedBaseIndex = getCenterBaseIndex(offset);
-  const isWin = (landedBaseIndex === winIdx);
+  const isWin = wantWin ? true : (landedBaseIndex === getWinIndex());
 
   // Mostra modal com imagem coerente do prêmio/símbolo
   showPrizeModal(isWin, landedBaseIndex);
@@ -442,6 +453,23 @@ function getCenterBaseIndex(offPx) {
 function normalizeOffset() {
   if (totalH === 0) return;
   offset = ((offset % totalH) + totalH) % totalH;
+}
+
+// Encontra a linha mais próxima (row) cujo símbolo base corresponde ao targetBaseIdx
+function findClosestRowForBaseIndex(targetBaseIdx, aroundRow) {
+  if (!repeated.length) return null;
+  const N = repeated.length;
+  let best = null;
+  let bestDist = Infinity;
+  for (let k = -N; k <= N; k++) {
+    const r = ((aroundRow + k) % N + N) % N;
+    const base = repeated[r] % symbols.length;
+    if (base === targetBaseIdx) {
+      const d = Math.abs(k);
+      if (d < bestDist) { bestDist = d; best = r; }
+    }
+  }
+  return best;
 }
 
 // Pequenas ajudas
