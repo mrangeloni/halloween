@@ -175,7 +175,7 @@ body {
     position: relative;
     z-index: 10;
     text-align: center;
-    padding: 16px;
+    padding: 8px 12px; /* menos espaço nas bordas, reduz gap superior */
     max-width: var(--app-max-width);
     width: 100%;
     margin: 0 auto;
@@ -383,7 +383,7 @@ body {
         background-size: 92% 92%;
     }
     .reels-container {
-        padding-top: 12%;
+        padding-top: 8%;
         padding-right: 6.5%;
     }
     .reel-viewport {
