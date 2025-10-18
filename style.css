@@ -278,7 +278,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    transform: translateX(-20px); /* move todo o slot 20px para a esquerda */
+    transform: translateX(20px); /* move todo o slot 20px para a esquerda */
 }
 
 .reels-container {
