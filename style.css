@@ -195,10 +195,10 @@ body {
     background: none;
     border: none;
     border-radius: 0;
-    padding: 20px 0;
+    padding: 8px 0 4px; /* menos espaço acima */
     box-shadow: none;
     position: relative;
-    margin-bottom: 10px;
+    margin-bottom: 6px;
 }
 
 .title {
@@ -220,11 +220,11 @@ body {
 /* Cabeçalho de imagem */
 .title-image {
     display: block;
-    max-width: 110%;
+    max-width: 120%;
     height: auto;
     margin: 0 auto;
     filter: drop-shadow(0 6px 14px rgba(0,0,0,0.6));
-    max-height: clamp(72px, 14svh, 120px);
+    max-height: clamp(88px, 16svh, 140px); /* título maior */
 }
 
 /* ========================================
@@ -368,7 +368,8 @@ body {
 }
 
 @media (max-width: 480px) {
-    .title-image { max-width: 95%; }
+    .title-image { max-width: 98%; }
+    .slot-header { padding: 6px 0 2px; margin-bottom: 4px; }
 
     .attempts-counter {
         padding: 8px 14px;
