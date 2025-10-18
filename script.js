@@ -311,7 +311,7 @@ async function spin() {
   // incentivo removido
 
   // Delay de 0,5s após o clique antes de iniciar o giro
-  await sleep(800);
+  await sleep(500);
   // Qual símbolo alvo? — 3ª tentativa sempre vence
   const wantWin = (currentAttempt === 3);
   const winIdx  = getWinIndex(); // índice do símbolo com WIN_NAME na base (0..4)
