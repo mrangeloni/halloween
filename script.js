@@ -110,6 +110,25 @@ function stopSfx(inst) {
   try { if (inst) inst.pause(); } catch (_) {}
 }
 
+// Aguarda o início real do áudio para sincronizar com a animação
+function waitForPlaying(audioEl, timeout = 200) {
+  return new Promise((resolve) => {
+    if (!audioEl) return resolve();
+    if (!audioEl.paused && audioEl.readyState > 2) return resolve();
+    let done = false;
+    const onPlaying = () => { if (!done) { done = true; cleanup(); resolve(); } };
+    const onTimeUpdate = () => { if (!done && !audioEl.paused) { done = true; cleanup(); resolve(); } };
+    const tid = setTimeout(() => { if (!done) { done = true; cleanup(); resolve(); } }, timeout);
+    function cleanup() {
+      clearTimeout(tid);
+      audioEl.removeEventListener('playing', onPlaying);
+      audioEl.removeEventListener('timeupdate', onTimeUpdate);
+    }
+    audioEl.addEventListener('playing', onPlaying, { once: true });
+    audioEl.addEventListener('timeupdate', onTimeUpdate, { once: true });
+  });
+}
+
 // --------- Estado do jogo ---------
 let attemptsLeft = 5;
 let currentAttempt = 0;
@@ -333,7 +352,7 @@ async function spin() {
   const winIdx  = getWinIndex(); // índice do símbolo com WIN_NAME na base (0..4)
   const targetBaseIndex = wantWin ? winIdx : getFixedNonWinIndex(winIdx);
 
-  // Som de giro (contínuo durante a animação)
+  // Som de giro (contínuo durante a animação) — prepara e sincroniza com o início da animação
   try {
     stopSfx(spinInstance);
     spinInstance = playSfx(sounds.spin, { loop: true, volume: sounds.spin.volume });
@@ -342,7 +361,6 @@ async function spin() {
 
   // Duração ~4s, começa rápido e desacelera (ease-out)
   const duration = 4000; // ms
-  const start    = performance.now();
   const startOffset = offset;
 
   // Precisamos garantir diversas “passagens” antes de parar no alvo.
@@ -352,9 +370,13 @@ async function spin() {
   const minTurns = 20; // passo fixo para padronizar o giro
   const endOffset = computeEndOffset(startOffset, targetBaseIndex, minTurns);
 
+  // Aguarda o áudio realmente entrar em 'playing' para iniciar a animação ao mesmo tempo
+  await waitForPlaying(spinInstance, 200);
+
   // Animação easeOutCubic
   await new Promise(resolve => {
     const easeOutCubic = t => 1 - Math.pow(1 - t, 3);
+    const start    = performance.now();
 
     const step = (now) => {
       const t = Math.min(1, (now - start) / duration);
