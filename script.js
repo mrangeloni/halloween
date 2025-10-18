@@ -289,6 +289,8 @@ async function spin() {
   updateAttemptsDisplay();
   // incentivo removido
 
+  // Delay de 0,5s após o clique antes de iniciar o giro
+  await sleep(500);
   // Qual símbolo alvo?
   // Dentro de cada bloco de 5 tentativas, define 1 vitória obrigatória
   if ((currentAttempt - cycleStartAttempt) >= 5) {
@@ -304,8 +306,8 @@ async function spin() {
   try { sounds.spin.currentTime = 0; sounds.spin.play(); } catch (_) {}
   ensureBackgroundMusic();
 
-  // Duração ~2s, adrenalina: começa MUITO rápido e desacelera
-  const duration = 2000; // ms
+  // Duração ~4s, começa rápido e desacelera (ease-out)
+  const duration = 4000; // ms
   const start    = performance.now();
   const startOffset = offset;
 
