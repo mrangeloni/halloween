@@ -86,6 +86,28 @@ function ensureBackgroundMusic() {
   } catch (_) {}
 }
 
+// Helper para tocar SFX confiavelmente em todas as rodadas
+function playSfx(baseAudio, opts = {}) {
+  const { loop = false, volume = null } = opts;
+  try {
+    const inst = baseAudio.cloneNode();
+    inst.loop = !!loop;
+    if (volume !== null) inst.volume = volume;
+    const p = inst.play();
+    if (p && typeof p.then === 'function') {
+      p.catch(async () => {
+        ensureBackgroundMusic();
+        try { await inst.play(); } catch (_) {}
+      });
+    }
+    return inst;
+  } catch (_) { return null; }
+}
+
+function stopSfx(inst) {
+  try { if (inst) inst.pause(); } catch (_) {}
+}
+
 // --------- Estado do jogo ---------
 let attemptsLeft = 5;
 let currentAttempt = 0;
@@ -275,7 +297,7 @@ function drawCanvas() {
 spinButton.addEventListener('click', spin);
 // Clique/Toque: som de clique + garantir música de fundo
 spinButton.addEventListener('pointerdown', () => {
-  try { sounds.click.currentTime = 0; sounds.click.play(); } catch (_) {}
+  playSfx(sounds.click, { volume: sounds.click.volume });
   ensureBackgroundMusic();
 }, { passive: true });
 
@@ -305,17 +327,8 @@ async function spin() {
 
   // Som de giro (contínuo durante a animação)
   try {
-    if (spinInstance) { try { spinInstance.pause(); } catch (_) {} }
-    spinInstance = sounds.spin.cloneNode();
-    spinInstance.loop = true;
-    spinInstance.volume = sounds.spin.volume;
-    const p = spinInstance.play();
-    if (p && typeof p.then === 'function') {
-      await p.catch(async () => {
-        ensureBackgroundMusic();
-        try { await spinInstance.play(); } catch (_) {}
-      });
-    }
+    stopSfx(spinInstance);
+    spinInstance = playSfx(sounds.spin, { loop: true, volume: sounds.spin.volume });
   } catch (_) {}
   ensureBackgroundMusic();
 
@@ -353,7 +366,7 @@ async function spin() {
   });
 
   // Termina som de giro
-  try { if (spinInstance) { spinInstance.pause(); spinInstance = null; } } catch (_) {}
+  try { if (spinInstance) { stopSfx(spinInstance); spinInstance = null; } } catch (_) {}
 
   // Verifica símbolo central ao terminar e vitória
   const landedBaseIndex = getCenterBaseIndex(offset);
@@ -445,8 +458,8 @@ function updateAttemptsDisplay() {
 function showPrizeModal(isWin, landedIndex) {
   lastIsWin = isWin;
   try {
-    if (isWin) { sounds.win.currentTime = 0; sounds.win.play(); }
-    else       { sounds.lose.currentTime = 0; sounds.lose.play(); }
+    if (isWin) { playSfx(sounds.win,  { volume: sounds.win.volume }); }
+    else       { playSfx(sounds.lose, { volume: sounds.lose.volume }); }
   } catch (_) {}
 
   if (isWin) {
@@ -505,6 +518,7 @@ rulesLink.addEventListener('click', (e) => {
 });
 closeRulesButton.addEventListener('click', closeRulesModal);
 closeRulesButton.addEventListener('pointerdown', ensureBackgroundMusic, { passive: true });
+closeRulesButton.addEventListener('pointerdown', () => playSfx(sounds.click, { volume: sounds.click.volume }), { passive: true });
 
 // Fecha modais ao clicar fora
 window.addEventListener('click', (e) => {
