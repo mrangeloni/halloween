@@ -75,6 +75,8 @@ const nextRoundButton  = document.getElementById('nextRoundButton');
 const rulesLink        = document.getElementById('rulesLink');
 const closeRulesButton = document.getElementById('closeRulesButton');
 const prizeBannerImg   = document.getElementById('prizeBannerImg');
+const PRIZE_URL        = 'https://lp.vidajoias.com/halloween/';
+let lastIsWin = false;
 
 // ÚNICO REEL (canvas renderer)
 const reelViewport = document.querySelector('.reel-viewport');
@@ -369,6 +371,7 @@ function updateAttemptsDisplay() {
 
 // --------- Modais ---------
 function showPrizeModal(isWin, landedIndex) {
+  lastIsWin = isWin;
   try {
     if (isWin) { sounds.win.currentTime = 0; sounds.win.play(); }
     else       { sounds.lose.currentTime = 0; sounds.lose.play(); }
@@ -398,6 +401,12 @@ function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
 // --------- Eventos dos botões ---------
 nextRoundButton.addEventListener('click', () => {
+  if (lastIsWin) {
+    // Redireciona para a página do prêmio
+    window.location.href = PRIZE_URL;
+    return;
+  }
+  // Caso de derrota: fecha modal e segue fluxo normal
   closePrizeModal();
   if (attemptsLeft === 0) {
     // Reiniciar rodada completa
@@ -407,7 +416,7 @@ nextRoundButton.addEventListener('click', () => {
     spinButton.disabled = false;
     spinButton.textContent = 'GIRAR';
     updateAttemptsDisplay();
-  // incentivo removido
+    // incentivo removido
   }
 });
 
