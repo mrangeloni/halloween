@@ -26,6 +26,7 @@ const fallbackSymbols = [
 
 const symbols = localSymbols.slice();
 const WIN_NAME = 'pote-5brindes'; // imagem que define vitória
+const WIN_SYMBOL_SRC = 'assets/symbols/pote-5brindes.png';
 // Deslocamento visual dos símbolos dentro da janela (sem mexer na moldura)
 const IMAGE_OFFSET_X = 8; // esquerda 5px
 const IMAGE_OFFSET_Y =  10; // baixo 5px
@@ -377,7 +378,11 @@ async function spin() {
 
 // Calcula o índice que corresponde ao símbolo vencedor na base (0..4)
 function getWinIndex() {
-  const idx = symbols.findIndex(src => typeof src === 'string' && src.includes(WIN_NAME));
+  // Prioriza correspondência exata com o caminho local
+  let idx = symbols.findIndex(src => src === WIN_SYMBOL_SRC);
+  if (idx >= 0) return idx;
+  // Alternativa: busca por nome parcial
+  idx = symbols.findIndex(src => typeof src === 'string' && src.includes(WIN_NAME));
   return idx >= 0 ? idx : 0;
 }
 
@@ -460,7 +465,7 @@ function showPrizeModal(isWin, landedIndex) {
   }
 
   // Imagem coerente com o símbolo que parou no centro
-  const imgSrc = getPrizeImageSrc(landedIndex);
+  const imgSrc = isWin ? WIN_SYMBOL_SRC : getPrizeImageSrc(landedIndex);
   const altTxt = getSymbolName(landedIndex, isWin);
   prizeBannerImg.src = imgSrc;
   prizeBannerImg.alt = altTxt;
