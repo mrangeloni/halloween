@@ -28,7 +28,7 @@ const symbols = localSymbols.slice();
 const WIN_NAME = 'pote-5brindes'; // imagem que define vitória
 // Deslocamento visual dos símbolos dentro da janela (sem mexer na moldura)
 const IMAGE_OFFSET_X = 8; // esquerda 5px
-const IMAGE_OFFSET_Y =  5; // baixo 5px
+const IMAGE_OFFSET_Y =  50; // baixo 5px
 
 // Fallback final: SVG embutido para garantir que sempre haja algo visível
 const FINAL_FALLBACK = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect width="100%" height="100%" fill="%232d1b4e"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="white" font-family="Arial" font-size="18">SEM IMAGEM</text></svg>';
@@ -72,6 +72,7 @@ backgroundMusic.loop = true;
 backgroundMusic.volume = 0.18;
 backgroundMusic.preload = 'auto';
 let bgStarted = false;
+let spinInstance = null; // instância clonada por tentativa
 
 function ensureBackgroundMusic() {
   if (bgStarted) return;
@@ -303,7 +304,19 @@ async function spin() {
   const targetBaseIndex = wantWin ? winIdx : getRandomNonWinIndex(winIdx);
 
   // Som de giro (contínuo durante a animação)
-  try { sounds.spin.currentTime = 0; sounds.spin.play(); } catch (_) {}
+  try {
+    if (spinInstance) { try { spinInstance.pause(); } catch (_) {} }
+    spinInstance = sounds.spin.cloneNode();
+    spinInstance.loop = true;
+    spinInstance.volume = sounds.spin.volume;
+    const p = spinInstance.play();
+    if (p && typeof p.then === 'function') {
+      await p.catch(async () => {
+        ensureBackgroundMusic();
+        try { await spinInstance.play(); } catch (_) {}
+      });
+    }
+  } catch (_) {}
   ensureBackgroundMusic();
 
   // Duração ~4s, começa rápido e desacelera (ease-out)
@@ -340,7 +353,7 @@ async function spin() {
   });
 
   // Termina som de giro
-  try { sounds.spin.pause(); } catch (_) {}
+  try { if (spinInstance) { spinInstance.pause(); spinInstance = null; } } catch (_) {}
 
   // Verifica símbolo central ao terminar e vitória
   const landedBaseIndex = getCenterBaseIndex(offset);
