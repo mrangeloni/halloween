@@ -290,7 +290,7 @@ async function spin() {
   // incentivo removido
 
   // Delay de 0,5s após o clique antes de iniciar o giro
-  await sleep(500);
+  await sleep(800);
   // Qual símbolo alvo?
   // Dentro de cada bloco de 5 tentativas, define 1 vitória obrigatória
   if ((currentAttempt - cycleStartAttempt) >= 5) {
