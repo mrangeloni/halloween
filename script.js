@@ -76,6 +76,7 @@ backgroundMusic.autoplay = true;
 let bgStarted = false;
 let bgStartedMuted = false;
 let spinInstance = null; // instância clonada por tentativa
+let audioUnlocked = false; // Safari/iOS: desbloqueia áudio na 1ª interação
 let allowWinSymbolRender = false; // só mostra o pote visualmente na 3ª tentativa
 
 function ensureBackgroundMusic(forceMutedHack = false) {
@@ -143,6 +144,38 @@ function playSfx(baseAudio, opts = {}) {
 
 function stopSfx(inst) {
   try { if (inst) inst.pause(); } catch (_) {}
+}
+// Desbloqueia elementos de áudio em um gesto do usuário (Safari/iOS)
+function unlockAllAudio() {
+  if (audioUnlocked) return;
+  const all = [...Object.values(sounds), backgroundMusic].filter(Boolean);
+  for (const a of all) {
+    try {
+      a.muted = false;
+      const vol = a.volume;
+      a.volume = 0; // evita clique alto
+      a.currentTime = 0;
+      const p = a.play();
+      if (p && typeof p.then === 'function') {
+        p.then(() => { try { a.pause(); a.volume = vol; } catch(_) {} }).catch(() => { try { a.volume = vol; } catch(_) {} });
+      } else {
+        try { a.pause(); a.volume = vol; } catch(_) {}
+      }
+    } catch(_) {}
+  }
+  audioUnlocked = true;
+}
+
+function playClick() {
+  try {
+    if (!audioUnlocked) {
+      // Usa o elemento base na 1ª vez para desbloquear em Safari
+      sounds.click.currentTime = 0;
+      sounds.click.play().catch(() => {});
+    } else {
+      playSfx(sounds.click, { volume: sounds.click.volume });
+    }
+  } catch(_) {}
 }
 
 // Aguarda o início real do áudio para sincronizar com a animação
@@ -368,10 +401,13 @@ function drawCanvas() {
 // --------- Girar ---------
 spinButton.addEventListener('click', spin);
 // Clique/Toque: som de clique + garantir música de fundo
-spinButton.addEventListener('pointerdown', () => {
-  playSfx(sounds.click, { volume: sounds.click.volume });
-  ensureBackgroundMusic();
-}, { passive: true });
+const primeAudio = () => { unlockAllAudio(); playClick(); ensureBackgroundMusic(); };
+spinButton.addEventListener('pointerdown', primeAudio, { passive: true });
+spinButton.addEventListener('touchstart', primeAudio, { passive: true });
+spinButton.addEventListener('mousedown', primeAudio, { passive: true });
+document.addEventListener('touchstart', unlockAllAudio, { passive: true, once: true });
+document.addEventListener('mousedown', unlockAllAudio, { passive: true, once: true });
+document.addEventListener('keydown', unlockAllAudio, { passive: true, once: true });
 
 async function spin() {
   if (isSpinning || attemptsLeft <= 0) return;
