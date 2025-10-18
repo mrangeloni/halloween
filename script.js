@@ -366,7 +366,6 @@ function updateAttemptsDisplay() {
 function updateEncouragement() {
   const messages = [
     'Gire e ganhe!',
-    'Boa sorte!',
     'Você consegue!',
     'Tente novamente!',
     'Última chance!'

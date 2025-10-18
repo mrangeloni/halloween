@@ -220,11 +220,11 @@ body {
 /* Cabeçalho de imagem */
 .title-image {
     display: block;
-    max-width: 100%;
+    max-width: 110%;
     height: auto;
     margin: 0 auto;
     filter: drop-shadow(0 6px 14px rgba(0,0,0,0.6));
-    max-height: clamp(56px, 12svh, 96px);
+    max-height: clamp(72px, 14svh, 120px);
 }
 
 /* ========================================
@@ -235,8 +235,8 @@ body {
     background: rgba(139, 69, 19, 0.8);
     border: 3px solid #ff8c00;
     border-radius: 15px;
-    padding: 10px 20px;
-    margin: 20px auto;
+    padding: 10px 18px;
+    margin: 12px auto 8px;
     max-width: 300px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
 }
@@ -367,7 +367,7 @@ body {
 }
 
 @media (max-width: 480px) {
-    .title-image { max-width: 85%; }
+    .title-image { max-width: 95%; }
 
     .attempts-counter {
         padding: 8px 14px;
@@ -377,28 +377,28 @@ body {
     .attempts-counter span { font-size: 1.2em; }
 
     .slot-frame {
-        width: clamp(280px, 70vw, 340px);
-        height: clamp(280px, 70vw, 340px);
-        background-size: 88% 88%;
+        width: clamp(300px, 78vw, 380px);
+        height: clamp(300px, 78vw, 380px);
+        background-size: 92% 92%;
     }
     .reels-container {
-        padding-top: 14%;
-        padding-right: 7.5%;
+        padding-top: 12%;
+        padding-right: 6.5%;
     }
     .reel-viewport {
-        width: 64%;
-        margin-left: -7%;
+        width: 68%;
+        margin-left: -6%;
     }
 
     .spin-button {
-        padding: 12px 32px;
-        font-size: 1.25em;
-        margin: 18px auto;
+        padding: 10px 26px;
+        font-size: 1.1em;
+        margin: 12px auto 6px;
     }
 
     .encouragement {
-        font-size: 1em;
-        margin-top: 10px;
+        font-size: 0.95em;
+        margin-top: 6px;
     }
 
     .rules-link a { font-size: 0.85em; }
@@ -448,13 +448,13 @@ body {
     background: linear-gradient(180deg, #ffa500 0%, #ff8c00 50%, #ff6600 100%);
     border: 6px solid #8b4513;
     border-radius: 50px;
-    padding: 20px 60px;
-    font-size: 2em;
+    padding: 16px 48px;
+    font-size: 1.6em;
     font-weight: bold;
     color: #4a2408;
     text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.5);
     cursor: pointer;
-    margin: 30px auto;
+    margin: 18px auto 8px;
     display: block;
     box-shadow: 
         0 8px 20px rgba(0, 0, 0, 0.5),
@@ -462,6 +462,7 @@ body {
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
+    text-align: center;
 }
 
 .spin-button:hover {
