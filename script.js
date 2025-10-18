@@ -51,11 +51,30 @@ function setSymbolImage(img, index) {
 
 // --------- Sons ---------
 const sounds = {
-  spin: new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3'),
-  win:  new Audio('https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3'),
-  lose: new Audio('https://assets.mixkit.co/active_storage/sfx/2572/2572-preview.mp3')
+  click: new Audio('https://assets.mixkit.co/active_storage/sfx/1165/1165-preview.mp3'), // clique curto
+  spin:  new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3'), // rotação
+  win:   new Audio('https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3'), // vitória
+  lose:  new Audio('https://assets.mixkit.co/active_storage/sfx/2572/2572-preview.mp3')  // derrota
 };
 Object.values(sounds).forEach(s => s.volume = 0.35);
+
+// Música de fundo (loop) — tentaremos tocar no load e, se bloqueado, na 1ª interação
+const backgroundMusic = new Audio('https://assets.mixkit.co/active_storage/music/1091/1091-preview.mp3');
+backgroundMusic.loop = true;
+backgroundMusic.volume = 0.18;
+let bgStarted = false;
+
+function ensureBackgroundMusic() {
+  if (bgStarted) return;
+  try {
+    const p = backgroundMusic.play();
+    if (p && typeof p.then === 'function') {
+      p.then(() => { bgStarted = true; }).catch(() => {});
+    } else {
+      bgStarted = true;
+    }
+  } catch (_) {}
+}
 
 // --------- Estado do jogo ---------
 let attemptsLeft = 5;
@@ -138,6 +157,8 @@ function preloadImages() {
 
 // --------- Inicialização ---------
 function init() {
+  // tenta iniciar música de fundo (pode ser bloqueado até 1ª interação)
+  ensureBackgroundMusic();
   setupCanvasSize();
   buildReel();
   preloadImages();
@@ -242,6 +263,11 @@ function drawCanvas() {
 
 // --------- Girar ---------
 spinButton.addEventListener('click', spin);
+// Clique/Toque: som de clique + garantir música de fundo
+spinButton.addEventListener('pointerdown', () => {
+  try { sounds.click.currentTime = 0; sounds.click.play(); } catch (_) {}
+  ensureBackgroundMusic();
+}, { passive: true });
 
 async function spin() {
   if (isSpinning || attemptsLeft <= 0) return;
@@ -267,6 +293,7 @@ async function spin() {
 
   // Som de giro (contínuo durante a animação)
   try { sounds.spin.currentTime = 0; sounds.spin.play(); } catch (_) {}
+  ensureBackgroundMusic();
 
   // Duração ~2s, adrenalina: começa MUITO rápido e desacelera
   const duration = 2000; // ms
@@ -450,8 +477,10 @@ nextRoundButton.addEventListener('click', () => {
 rulesLink.addEventListener('click', (e) => {
   e.preventDefault();
   showRulesModal();
+  ensureBackgroundMusic();
 });
 closeRulesButton.addEventListener('click', closeRulesModal);
+closeRulesButton.addEventListener('pointerdown', ensureBackgroundMusic, { passive: true });
 
 // Fecha modais ao clicar fora
 window.addEventListener('click', (e) => {
