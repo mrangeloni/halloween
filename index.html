@@ -8,11 +8,11 @@
 </head>
 <body>
     <!-- Morcegos animados -->
-    <img src="assets/bats.png" alt="Morcegos" class="bats bats1" />
-    <img src="assets/bats.png" alt="Morcegos" class="bats bats2" />
-    <img src="assets/bats.png" alt="Morcegos" class="bats bats3" />
-    <img src="assets/bats.png" alt="Morcegos" class="bats bats4" />
-    <img src="assets/bats.png" alt="Morcegos" class="bats bats5" />
+    <div class="bat bat1"></div>
+    <div class="bat bat2"></div>
+    <div class="bat bat3"></div>
+    <div class="bat bat4"></div>
+    <div class="bat bat5"></div>
     
     <!-- Lua de fundo -->
     <div class="moon"></div>
@@ -21,7 +21,7 @@
     <div class="container">
         <!-- Cabeçalho da máquina -->
         <div class="slot-header">
-            <img src="assets/header-title.png" alt="Trick or Treat" class="title-image" />
+            <h1 class="title">TRICK<br><span class="or">- OR -</span><br>TREAT</h1>
         </div>
 
         <!-- Contador de tentativas -->
@@ -33,19 +33,27 @@
         <div class="slot-machine">
             <div class="slot-frame">
                 <div class="reels-container">
-                <div class="reel-viewport">
-                  <!-- Canvas renderer (novo): desenha os símbolos e o giro sem bugs de imagem -->
-                  <canvas class="reel-canvas" id="reelCanvas"></canvas>
-
-                  <!-- Reel DOM antigo (mantido como fallback/backup, oculto por CSS) -->
-                  <div class="reel" id="reel1" aria-hidden="true">
-                      <div class="symbol"><img src="" alt="Símbolo 1" class="symbol-img" data-symbol="symbol1"></div>
-                      <div class="symbol"><img src="" alt="Símbolo 2" class="symbol-img" data-symbol="symbol2"></div>
-                      <div class="symbol"><img src="" alt="Símbolo 3" class="symbol-img" data-symbol="symbol3"></div>
-                      <div class="symbol"><img src="" alt="Símbolo 4" class="symbol-img" data-symbol="symbol4"></div>
-                      <div class="symbol"><img src="" alt="Símbolo 5" class="symbol-img" data-symbol="symbol5"></div>
-                  </div>
-                </div>
+                    <div class="reel" id="reel1">
+                        <div class="symbol"><img src="" alt="Símbolo 1" class="symbol-img" data-symbol="symbol1"></div>
+                        <div class="symbol"><img src="" alt="Símbolo 2" class="symbol-img" data-symbol="symbol2"></div>
+                        <div class="symbol"><img src="" alt="Símbolo 3" class="symbol-img" data-symbol="symbol3"></div>
+                        <div class="symbol"><img src="" alt="Símbolo 4" class="symbol-img" data-symbol="symbol4"></div>
+                        <div class="symbol"><img src="" alt="Símbolo 5" class="symbol-img" data-symbol="symbol5"></div>
+                    </div>
+                    <div class="reel" id="reel2">
+                        <div class="symbol"><img src="" alt="Símbolo 1" class="symbol-img" data-symbol="symbol1"></div>
+                        <div class="symbol"><img src="" alt="Símbolo 2" class="symbol-img" data-symbol="symbol2"></div>
+                        <div class="symbol"><img src="" alt="Símbolo 3" class="symbol-img" data-symbol="symbol3"></div>
+                        <div class="symbol"><img src="" alt="Símbolo 4" class="symbol-img" data-symbol="symbol4"></div>
+                        <div class="symbol"><img src="" alt="Símbolo 5" class="symbol-img" data-symbol="symbol5"></div>
+                    </div>
+                    <div class="reel" id="reel3">
+                        <div class="symbol"><img src="" alt="Símbolo 1" class="symbol-img" data-symbol="symbol1"></div>
+                        <div class="symbol"><img src="" alt="Símbolo 2" class="symbol-img" data-symbol="symbol2"></div>
+                        <div class="symbol"><img src="" alt="Símbolo 3" class="symbol-img" data-symbol="symbol3"></div>
+                        <div class="symbol"><img src="" alt="Símbolo 4" class="symbol-img" data-symbol="symbol4"></div>
+                        <div class="symbol"><img src="" alt="Símbolo 5" class="symbol-img" data-symbol="symbol5"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -56,13 +64,18 @@
         </button>
 
         <!-- Alavanca decorativa -->
+        <div class="lever"></div>
 
-        
+        <!-- Mensagem de incentivo -->
+        <p class="encouragement" id="encouragement">Gire e ganhe!</p>
     </div>
 
     <!-- Decorações de Halloween -->
     <div class="decorations">
-        <!-- Removidos: abóboras, caldeirão animado e chapéu -->
+        <div class="pumpkin pumpkin-left"></div>
+        <div class="pumpkin pumpkin-right"></div>
+        <div class="cauldron cauldron-left"></div>
+        <div class="witch-hat"></div>
     </div>
 
     <!-- Modal de prêmio -->
@@ -86,10 +99,12 @@
     <!-- Modal de regras -->
     <div class="modal" id="rulesModal">
         <div class="modal-content rules-content">
-            <h2>Regras</h2>
-            <p>• Você tem 5 tentativas por rodada.</p>
-            <p>• Na 3ª tentativa há prêmio garantido.</p>
-            <p>• Prêmios variam conforme o símbolo.</p>
+            <h2>Regras do Jogo</h2>
+            <p>🎃 Você tem 5 tentativas para girar a slot machine de Halloween!</p>
+            <p>🎰 Gire as bobinas e descubra qual prêmio você ganhou.</p>
+            <p>🏆 Na 4ª tentativa, você ganhará um MEGA PRÊMIO especial!</p>
+            <p>🎁 Cada giro revela um prêmio único.</p>
+            <p>👻 Boa sorte e divirta-se!</p>
             <button class="modal-button" id="closeRulesButton">Fechar</button>
         </div>
     </div>
