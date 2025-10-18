@@ -345,9 +345,6 @@ body {
     max-height: 90%;
     object-fit: contain;
     filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
-    position: relative;
-    left: -5px;  /* 5px para a esquerda */
-    top: 5px;    /* 5px para baixo */
 }
 
 /* As imagens também giram durante o spin para dar o efeito desejado */
