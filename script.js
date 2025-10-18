@@ -65,7 +65,6 @@ let predeterminedWinAttempt = 3; // 3ª tentativa garante vitória
 // --------- DOM ---------
 const spinButton       = document.getElementById('spinButton');
 const attemptsDisplay  = document.getElementById('attempts');
-const encouragement    = document.getElementById('encouragement');
 
 const prizeModal       = document.getElementById('prizeModal');
 const rulesModal       = document.getElementById('rulesModal');
@@ -123,7 +122,7 @@ function init() {
   buildReel();
   preloadImages();
   updateAttemptsDisplay();
-  updateEncouragement();
+  // incentivo removido
 }
 document.addEventListener('DOMContentLoaded', init);
 window.addEventListener('resize', () => {
@@ -233,7 +232,7 @@ async function spin() {
   currentAttempt++;
   attemptsLeft--;
   updateAttemptsDisplay();
-  updateEncouragement();
+  // incentivo removido
 
   // Qual símbolo alvo?
   const wantWin = (currentAttempt === predeterminedWinAttempt);
@@ -363,22 +362,7 @@ function updateAttemptsDisplay() {
   attemptsDisplay.textContent = attemptsLeft;
 }
 
-function updateEncouragement() {
-  const messages = [
-    'Gire e ganhe!',
-    'Você consegue!',
-    'Tente novamente!',
-    'Última chance!'
-  ];
-
-  if (attemptsLeft === 0) {
-    encouragement.textContent = 'Fim de jogo!';
-  } else if (attemptsLeft === 1) {
-    encouragement.textContent = messages[4];
-  } else {
-    encouragement.textContent = messages[Math.min(currentAttempt, messages.length - 1)];
-  }
-}
+// incentivo removido
 
 // --------- Modais ---------
 function showPrizeModal(isWin, landedIndex) {
@@ -420,7 +404,7 @@ nextRoundButton.addEventListener('click', () => {
     spinButton.disabled = false;
     spinButton.textContent = 'GIRAR';
     updateAttemptsDisplay();
-    updateEncouragement();
+  // incentivo removido
   }
 });
 
