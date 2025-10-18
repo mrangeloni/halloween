@@ -72,56 +72,20 @@ const backgroundMusic = new Audio(SOUND_PATHS.bg);
 backgroundMusic.loop = true;
 backgroundMusic.volume = 0.18;
 backgroundMusic.preload = 'auto';
-backgroundMusic.autoplay = true;
 let bgStarted = false;
-let bgStartedMuted = false;
 let spinInstance = null; // instância clonada por tentativa
-let audioUnlocked = false; // Safari/iOS: desbloqueia áudio na 1ª interação
 let allowWinSymbolRender = false; // só mostra o pote visualmente na 3ª tentativa
 
-function ensureBackgroundMusic(forceMutedHack = false) {
+function ensureBackgroundMusic() {
   if (bgStarted) return;
   try {
     const p = backgroundMusic.play();
     if (p && typeof p.then === 'function') {
-      p.then(() => { bgStarted = true; }).catch(() => {
-        if (forceMutedHack && !bgStartedMuted) {
-          try {
-            backgroundMusic.muted = true;
-            const q = backgroundMusic.play();
-            if (q && typeof q.then === 'function') {
-              q.then(() => {
-                bgStarted = true;
-                bgStartedMuted = true;
-                setTimeout(() => { try { backgroundMusic.muted = false; } catch(_){} }, 300);
-              }).catch(() => {});
-            } else {
-              bgStarted = true; bgStartedMuted = true;
-              setTimeout(() => { try { backgroundMusic.muted = false; } catch(_){} }, 300);
-            }
-          } catch (_) {}
-        }
-      });
+      p.then(() => { bgStarted = true; }).catch(() => {});
     } else {
       bgStarted = true;
     }
-  } catch (_) {
-    if (forceMutedHack && !bgStartedMuted) {
-      try {
-        backgroundMusic.muted = true;
-        const q = backgroundMusic.play();
-        if (q && typeof q.then === 'function') {
-          q.then(() => {
-            bgStarted = true; bgStartedMuted = true;
-            setTimeout(() => { try { backgroundMusic.muted = false; } catch(_){} }, 300);
-          }).catch(() => {});
-        } else {
-          bgStarted = true; bgStartedMuted = true;
-          setTimeout(() => { try { backgroundMusic.muted = false; } catch(_){} }, 300);
-        }
-      } catch(_) {}
-    }
-  }
+  } catch (_) {}
 }
 
 // Helper para tocar SFX confiavelmente em todas as rodadas
@@ -144,57 +108,6 @@ function playSfx(baseAudio, opts = {}) {
 
 function stopSfx(inst) {
   try { if (inst) inst.pause(); } catch (_) {}
-}
-// Desbloqueia elementos de áudio em um gesto do usuário (Safari/iOS)
-function unlockAllAudio() {
-  if (audioUnlocked) return;
-  const all = [...Object.values(sounds), backgroundMusic].filter(Boolean);
-  for (const a of all) {
-    try {
-      a.muted = false;
-      const vol = a.volume;
-      a.volume = 0; // evita clique alto
-      a.currentTime = 0;
-      const p = a.play();
-      if (p && typeof p.then === 'function') {
-        p.then(() => { try { a.pause(); a.volume = vol; } catch(_) {} }).catch(() => { try { a.volume = vol; } catch(_) {} });
-      } else {
-        try { a.pause(); a.volume = vol; } catch(_) {}
-      }
-    } catch(_) {}
-  }
-  audioUnlocked = true;
-}
-
-function playClick() {
-  try {
-    if (!audioUnlocked) {
-      // Usa o elemento base na 1ª vez para desbloquear em Safari
-      sounds.click.currentTime = 0;
-      sounds.click.play().catch(() => {});
-    } else {
-      playSfx(sounds.click, { volume: sounds.click.volume });
-    }
-  } catch(_) {}
-}
-
-// Aguarda o início real do áudio para sincronizar com a animação
-function waitForPlaying(audioEl, timeout = 200) {
-  return new Promise((resolve) => {
-    if (!audioEl) return resolve();
-    if (!audioEl.paused && audioEl.readyState > 2) return resolve();
-    let done = false;
-    const onPlaying = () => { if (!done) { done = true; cleanup(); resolve(); } };
-    const onTimeUpdate = () => { if (!done && !audioEl.paused) { done = true; cleanup(); resolve(); } };
-    const tid = setTimeout(() => { if (!done) { done = true; cleanup(); resolve(); } }, timeout);
-    function cleanup() {
-      clearTimeout(tid);
-      audioEl.removeEventListener('playing', onPlaying);
-      audioEl.removeEventListener('timeupdate', onTimeUpdate);
-    }
-    audioEl.addEventListener('playing', onPlaying, { once: true });
-    audioEl.addEventListener('timeupdate', onTimeUpdate, { once: true });
-  });
 }
 
 // --------- Estado do jogo ---------
@@ -285,17 +198,6 @@ function init() {
   // incentivo removido
 }
 document.addEventListener('DOMContentLoaded', init);
-// Força tentativa ao abrir a página
-window.addEventListener('load', () => ensureBackgroundMusic(true));
-window.addEventListener('pageshow', () => ensureBackgroundMusic(true));
-document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible') ensureBackgroundMusic(true);
-});
-// Garante desmutar na primeira interação
-document.addEventListener('pointerdown', () => {
-  if (backgroundMusic && !bgStarted) ensureBackgroundMusic(true);
-  try { if (backgroundMusic && backgroundMusic.muted) backgroundMusic.muted = false; } catch (_) {}
-}, { once: false, passive: true });
 window.addEventListener('resize', () => {
   const oldH = symbolH || reelViewport.clientHeight || 264;
   setupCanvasSize();
@@ -401,13 +303,10 @@ function drawCanvas() {
 // --------- Girar ---------
 spinButton.addEventListener('click', spin);
 // Clique/Toque: som de clique + garantir música de fundo
-const primeAudio = () => { unlockAllAudio(); playClick(); ensureBackgroundMusic(); };
-spinButton.addEventListener('pointerdown', primeAudio, { passive: true });
-spinButton.addEventListener('touchstart', primeAudio, { passive: true });
-spinButton.addEventListener('mousedown', primeAudio, { passive: true });
-document.addEventListener('touchstart', unlockAllAudio, { passive: true, once: true });
-document.addEventListener('mousedown', unlockAllAudio, { passive: true, once: true });
-document.addEventListener('keydown', unlockAllAudio, { passive: true, once: true });
+spinButton.addEventListener('pointerdown', () => {
+  playSfx(sounds.click, { volume: sounds.click.volume });
+  ensureBackgroundMusic();
+}, { passive: true });
 
 async function spin() {
   if (isSpinning || attemptsLeft <= 0) return;
@@ -434,7 +333,7 @@ async function spin() {
   const winIdx  = getWinIndex(); // índice do símbolo com WIN_NAME na base (0..4)
   const targetBaseIndex = wantWin ? winIdx : getFixedNonWinIndex(winIdx);
 
-  // Som de giro (contínuo durante a animação) — prepara e sincroniza com o início da animação
+  // Som de giro (contínuo durante a animação)
   try {
     stopSfx(spinInstance);
     spinInstance = playSfx(sounds.spin, { loop: true, volume: sounds.spin.volume });
@@ -443,6 +342,7 @@ async function spin() {
 
   // Duração ~4s, começa rápido e desacelera (ease-out)
   const duration = 4000; // ms
+  const start    = performance.now();
   const startOffset = offset;
 
   // Precisamos garantir diversas “passagens” antes de parar no alvo.
@@ -452,13 +352,9 @@ async function spin() {
   const minTurns = 20; // passo fixo para padronizar o giro
   const endOffset = computeEndOffset(startOffset, targetBaseIndex, minTurns);
 
-  // Aguarda o áudio realmente entrar em 'playing' para iniciar a animação ao mesmo tempo
-  await waitForPlaying(spinInstance, 200);
-
   // Animação easeOutCubic
   await new Promise(resolve => {
     const easeOutCubic = t => 1 - Math.pow(1 - t, 3);
-    const start    = performance.now();
 
     const step = (now) => {
       const t = Math.min(1, (now - start) / duration);
