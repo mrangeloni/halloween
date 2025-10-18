@@ -72,20 +72,55 @@ const backgroundMusic = new Audio(SOUND_PATHS.bg);
 backgroundMusic.loop = true;
 backgroundMusic.volume = 0.18;
 backgroundMusic.preload = 'auto';
+backgroundMusic.autoplay = true;
 let bgStarted = false;
+let bgStartedMuted = false;
 let spinInstance = null; // instância clonada por tentativa
 let allowWinSymbolRender = false; // só mostra o pote visualmente na 3ª tentativa
 
-function ensureBackgroundMusic() {
+function ensureBackgroundMusic(forceMutedHack = false) {
   if (bgStarted) return;
   try {
     const p = backgroundMusic.play();
     if (p && typeof p.then === 'function') {
-      p.then(() => { bgStarted = true; }).catch(() => {});
+      p.then(() => { bgStarted = true; }).catch(() => {
+        if (forceMutedHack && !bgStartedMuted) {
+          try {
+            backgroundMusic.muted = true;
+            const q = backgroundMusic.play();
+            if (q && typeof q.then === 'function') {
+              q.then(() => {
+                bgStarted = true;
+                bgStartedMuted = true;
+                setTimeout(() => { try { backgroundMusic.muted = false; } catch(_){} }, 300);
+              }).catch(() => {});
+            } else {
+              bgStarted = true; bgStartedMuted = true;
+              setTimeout(() => { try { backgroundMusic.muted = false; } catch(_){} }, 300);
+            }
+          } catch (_) {}
+        }
+      });
     } else {
       bgStarted = true;
     }
-  } catch (_) {}
+  } catch (_) {
+    if (forceMutedHack && !bgStartedMuted) {
+      try {
+        backgroundMusic.muted = true;
+        const q = backgroundMusic.play();
+        if (q && typeof q.then === 'function') {
+          q.then(() => {
+            bgStarted = true; bgStartedMuted = true;
+            setTimeout(() => { try { backgroundMusic.muted = false; } catch(_){} }, 300);
+          }).catch(() => {});
+        } else {
+          bgStarted = true; bgStartedMuted = true;
+          setTimeout(() => { try { backgroundMusic.muted = false; } catch(_){} }, 300);
+        }
+      } catch(_) {}
+    }
+  }
 }
 
 // Helper para tocar SFX confiavelmente em todas as rodadas
@@ -217,6 +252,17 @@ function init() {
   // incentivo removido
 }
 document.addEventListener('DOMContentLoaded', init);
+// Força tentativa ao abrir a página
+window.addEventListener('load', () => ensureBackgroundMusic(true));
+window.addEventListener('pageshow', () => ensureBackgroundMusic(true));
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') ensureBackgroundMusic(true);
+});
+// Garante desmutar na primeira interação
+document.addEventListener('pointerdown', () => {
+  if (backgroundMusic && !bgStarted) ensureBackgroundMusic(true);
+  try { if (backgroundMusic && backgroundMusic.muted) backgroundMusic.muted = false; } catch (_) {}
+}, { once: false, passive: true });
 window.addEventListener('resize', () => {
   const oldH = symbolH || reelViewport.clientHeight || 264;
   setupCanvasSize();
