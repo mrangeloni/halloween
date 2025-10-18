@@ -195,10 +195,10 @@ body {
     background: none;
     border: none;
     border-radius: 0;
-    padding: 20px 0;
+    padding: 8px 0; /* menos espaço no topo */
     box-shadow: none;
     position: relative;
-    margin-bottom: 10px;
+    margin-bottom: 4px; /* aproxima do restante */
 }
 
 .title {
@@ -220,11 +220,11 @@ body {
 /* Cabeçalho de imagem */
 .title-image {
     display: block;
-    max-width: 110%;
+    max-width: 120%;
     height: auto;
     margin: 0 auto;
     filter: drop-shadow(0 6px 14px rgba(0,0,0,0.6));
-    max-height: clamp(72px, 14svh, 120px);
+    max-height: clamp(84px, 16svh, 140px); /* aumenta o título */
 }
 
 /* ========================================
