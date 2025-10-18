@@ -74,6 +74,7 @@ backgroundMusic.volume = 0.18;
 backgroundMusic.preload = 'auto';
 let bgStarted = false;
 let spinInstance = null; // instância clonada por tentativa
+let allowWinSymbolRender = false; // só mostra o pote visualmente na 3ª tentativa
 
 function ensureBackgroundMusic() {
   if (bgStarted) return;
@@ -260,7 +261,14 @@ function drawCanvas() {
   let y = yStart;
   let row = firstRow;
   while (y < h + symbolH) {
-    const baseIdx = repeated[(row % repeated.length + repeated.length) % repeated.length];
+    let baseIdx = repeated[(row % repeated.length + repeated.length) % repeated.length];
+    // Em tentativas que não são a 3ª, substitui visualmente o pote por outro símbolo
+    if (!allowWinSymbolRender) {
+      const wIdx = getWinIndex();
+      if (baseIdx === wIdx) {
+        baseIdx = (wIdx + 1) % symbols.length; // próximo símbolo não vencedor
+      }
+    }
     const img = loadedImages[baseIdx];
     // desenha imagem centralizada
     if (img) {
@@ -315,6 +323,7 @@ async function spin() {
   await sleep(500);
   // Qual símbolo alvo? — 3ª tentativa sempre vence
   const wantWin = (currentAttempt === 3);
+  allowWinSymbolRender = wantWin;
   const winIdx  = getWinIndex(); // índice do símbolo com WIN_NAME na base (0..4)
   const targetBaseIndex = wantWin ? winIdx : getRandomNonWinIndex(winIdx);
 
@@ -360,6 +369,7 @@ async function spin() {
 
   // Termina som de giro
   try { if (spinInstance) { stopSfx(spinInstance); spinInstance = null; } } catch (_) {}
+  allowWinSymbolRender = false;
 
   // Verifica símbolo central ao terminar e vitória
   const landedBaseIndex = getCenterBaseIndex(offset);
